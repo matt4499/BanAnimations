@@ -59,7 +59,7 @@ public class PigAnimation extends Animation {
             item.remove();
          }
 
-         super.punishPlayer(sender, target, type, reason);
+         super.finish(sender, target, type, reason);
       }, 3L, TimeUnit.SECONDS);
    }
 }

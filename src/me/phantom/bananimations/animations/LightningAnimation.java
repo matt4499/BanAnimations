@@ -44,7 +44,7 @@ public class LightningAnimation extends Animation {
                items[i].setVelocity(new Vector(this.getRandom().nextDouble() * 0.8D - 0.4D, 0.6D, this.getRandom().nextDouble() * 0.8D - 0.4D));
             }
 
-            super.punishPlayer(sender, target, type, reason);
+            super.finish(sender, target, type, reason);
             taskHelper.cancel();
          } else if (taskHelper.getCounter() < 3) {
             world.strikeLightningEffect(locations[taskHelper.getCounter()]);

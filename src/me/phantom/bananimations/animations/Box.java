@@ -51,7 +51,7 @@ public class Box extends Animation {
          stands.forEach((stand) -> {
             stand.remove();
          });
-         super.punishPlayer(sender, target, type, reason);
+         super.finish(sender, target, type, reason);
       }, 5L, TimeUnit.SECONDS);
    }
 

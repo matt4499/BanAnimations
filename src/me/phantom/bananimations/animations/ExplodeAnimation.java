@@ -26,7 +26,7 @@ public class ExplodeAnimation extends Animation {
          tnt.remove();
          target.getWorld().playEffect(target.getLocation(), Effect.valueOf("SMOKE"), 1);
          target.getWorld().playSound(target.getEyeLocation(), Sounds.ENTITY_GENERIC_EXPLODE.get(), 1.0F, 1.0F);
-         super.punishPlayer(sender, target, type, reason);
+         super.finish(sender, target, type, reason);
       }, 5L, TimeUnit.SECONDS);
    }
 }

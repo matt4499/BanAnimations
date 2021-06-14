@@ -51,7 +51,7 @@ public class MeteorAnimation extends Animation {
                world.playEffect(stand.getLocation(), Effect.valueOf("SMOKE"), 1);
                world.playSound(stand.getEyeLocation(), Sounds.ENTITY_GENERIC_EXPLODE.get(), 0.3F, 1.0F);
                stand.remove();
-               super.punishPlayer(sender, target, type, reason);
+               super.finish(sender, target, type, reason);
                Bukkit.getScheduler().cancelTask(trailID);
                taskHelper.cancel();
             }

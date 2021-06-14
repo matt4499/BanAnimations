@@ -57,7 +57,7 @@ public void playAnimation(CommandSender sender, Player target, AnimationType typ
       return locations;
    }
    static boolean finish(YinYang animation, CommandSender sender, Player player, AnimationType aniType, String reason) {
-      return animation.punishPlayer(sender, player, aniType, reason);
+      return animation.finish(sender, player, aniType, reason);
    }
    static float getRadius(YinYang animation) {
       return animation.radius;

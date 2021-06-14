@@ -49,7 +49,7 @@ public void playAnimation(CommandSender sender, Player target, AnimationType typ
          });
          world.playEffect(target.getLocation(), Effect.valueOf("SMOKE"), 1);
          world.playSound(target.getLocation(), Sounds.ENTITY_GENERIC_EXPLODE.get(), 0.5F, 1.0F);
-         super.punishPlayer(sender, target, type, reason);
+         super.finish(sender, target, type, reason);
       }, 2L, TimeUnit.SECONDS);
    }
 

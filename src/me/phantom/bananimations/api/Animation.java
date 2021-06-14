@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -34,11 +35,15 @@ public abstract class Animation {
 
    public abstract void playAnimation(CommandSender var1, Player var2, AnimationType var3, String var4);
 
-   public boolean punishPlayer(CommandSender sender, Player target, AnimationType type, String reason) {
+   public boolean finish(CommandSender sender, Player target, AnimationType type, String reason) {
       if (type != AnimationType.TEST) {
-         Bukkit.dispatchCommand(sender, type + " " + target.getName() + " " + reason);
-         target.playSound(target.getEyeLocation(), Sounds.ENTITY_WITHER_AMBIENT.get(), 0.1F, 2.0F);
-         this.playSound(target, sender, Sounds.ENTITY_WITHER_AMBIENT.get(), 0.1F, 2.0F);
+         try {
+            Bukkit.dispatchCommand(sender, type + " " + target.getName() + " " + reason);
+            target.playSound(target.getEyeLocation(), Sounds.ENTITY_WITHER_AMBIENT.get(), 0.1F, 2.0F);
+            this.playSound(target, sender, Sounds.ENTITY_WITHER_AMBIENT.get(), 0.1F, 2.0F);
+         } catch (CommandException e) {
+            e.printStackTrace();
+         }
       }
 
       this.unFreeze(target);
@@ -94,12 +99,6 @@ public abstract class Animation {
    }
 
    public void hook() {
-      try {
          this.plugin.registerAnimation(this, this.name);
-      } catch (NumberFormatException var2) {
-         Bukkit.getLogger()
-               .severe("The animation " + this.name + "'s version depend is an incorrect version! Hook aborted!");
-      }
-
    }
 }

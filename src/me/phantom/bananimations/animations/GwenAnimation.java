@@ -62,7 +62,7 @@ public class GwenAnimation extends Animation {
    }
 
    static boolean finish(GwenAnimation animation, CommandSender sender, Player player, AnimationType aniType, String reason) {
-      return animation.punishPlayer(sender, player, aniType, reason);
+      return animation.finish(sender, player, aniType, reason);
    }
 
    static Location[] getLocationCross(GwenAnimation animation, Location x1) {

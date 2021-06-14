@@ -27,7 +27,7 @@ public class SnapTrapAnimation extends Animation {
             EvokerFangs fangs = (EvokerFangs)world.spawnEntity(targetLocation, EntityType.EVOKER_FANGS);
             fangs.setCustomNameVisible(false);
             fangs.setCustomName("ba-fangs");
-            super.punishPlayer(sender, target, type, reason);
+            super.finish(sender, target, type, reason);
             taskHelper.cancel();
          }
 

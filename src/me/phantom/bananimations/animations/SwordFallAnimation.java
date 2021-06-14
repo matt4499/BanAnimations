@@ -41,7 +41,7 @@ public class SwordFallAnimation extends Animation {
             stand.remove();
          }
 
-         super.punishPlayer(sender, target, type, reason);
+         super.finish(sender, target, type, reason);
       }, 3L, TimeUnit.SECONDS);
    }
 
