@@ -74,9 +74,8 @@ class GwenAnimation$1 extends BukkitRunnable {
             Location location = guardians[target];
             location.setDirection(standLocation.clone().toVector().subtract(location.toVector()));
             Guardian guardian = this.guardians.get(target);
-            guardian.setTarget(null);
-            guardian.setTarget(this.stand);
-            guardian.setVelocity(new Vector(0, 0, 0));
+            //guardian.setTarget(null);
+            //guardian.setTarget(this.stand);
             guardian.teleport(location);
          }
       } else {
@@ -84,9 +83,10 @@ class GwenAnimation$1 extends BukkitRunnable {
 
          for (Iterator<Guardian> location = this.guardians.iterator(); location.hasNext(); radSpot+=Math.toRadians(90)) {
             Guardian guardian = location.next();
-            guardian.teleport(
-                  Utils.getLocationAroundCircle(this.guardianCenter, GwenAnimation.getRadius(this.animation),
-                        (this.radPerSec * (double) this.taskHelper.getCounter()) + radSpot));
+            Location loc =  Utils.getLocationAroundCircle(this.guardianCenter, GwenAnimation.getRadius(this.animation),
+                    (this.radPerSec * (double) this.taskHelper.getCounter()) + radSpot);
+            loc.setDirection(this.stand.getEyeLocation().clone().toVector().subtract(loc.toVector()));
+            guardian.teleport(loc);
             guardian.setTarget(this.stand);
          }
 

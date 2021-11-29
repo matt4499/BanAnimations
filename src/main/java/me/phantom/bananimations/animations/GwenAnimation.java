@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 
 public class GwenAnimation extends Animation {
    private ArmorStandBuilder ab = (new ArmorStandBuilder(this.getPlugin(), null)).withInvisible().withNoGravity();
-   private float radius = 4.5F;
+   private float radius = 4F;
 
    public GwenAnimation() {
       super("gwen");
@@ -28,7 +28,7 @@ public class GwenAnimation extends Animation {
       Location targetLocation = target.getLocation();
       World world = targetLocation.getWorld();
       ArmorStand stand = this.ab.withLocation(targetLocation).spawn();
-      Location guardianCenter = targetLocation.clone().add(0.0D, 8.0D, 0.0D);
+      Location guardianCenter = targetLocation.clone().add(0.0D, 7.0D, 0.0D);
       List<Guardian> guardians = new ArrayList<Guardian>();
       Location[] locationsCross = this.getLocationsCross(guardianCenter);
       int locationCrossLength = locationsCross.length;
