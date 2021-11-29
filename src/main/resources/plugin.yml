@@ -1,0 +1,10 @@
+name: BanAnimations
+version: '${project.version}'
+main: me.phantom.bananimations.BanAnimations
+api-version: 1.17
+prefix: BanAnims
+authors: [ Phantom_, Matt4499 ]
+description: Ban hackers and rulebreakers with fashion!
+commands:
+    bananimations:
+      aliases: ba
