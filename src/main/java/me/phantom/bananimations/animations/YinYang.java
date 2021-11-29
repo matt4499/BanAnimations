@@ -29,9 +29,9 @@ public class YinYang extends Animation {
       super("yinyang");
       this.whiteWool = new ItemStack(Material.WHITE_WOOL);
       this.blackWool = new ItemStack(Material.BLACK_WOOL);
-      this.whiteAB = (new ArmorStandBuilder(this.getPlugin(), (Location)null)).withInvisible().withNoGravity().withHelmet(this.whiteWool);
-      this.blackAB = (new ArmorStandBuilder(this.getPlugin(), (Location)null)).withInvisible().withNoGravity().withHelmet(this.blackWool);
-      this.radius = 1.5F;
+      this.whiteAB = (new ArmorStandBuilder(this.getPlugin(), null)).withInvisible().withNoGravity().withHelmet(this.whiteWool);
+      this.blackAB = (new ArmorStandBuilder(this.getPlugin(), null)).withInvisible().withNoGravity().withHelmet(this.blackWool);
+      this.radius = 1.25F;
    }
 
 public void playAnimation(CommandSender sender, Player target, AnimationType type, String reason) {
@@ -45,7 +45,7 @@ public void playAnimation(CommandSender sender, Player target, AnimationType typ
       List<Item> items = new ArrayList<Item>();
       RepeatingTaskHelper taskHelper = new RepeatingTaskHelper();
       //taskHelper.setTaskID(Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this.getPlugin(), new YinYang$1(this, taskHelper, items, stands, world, targetLocation, sender, target, type, reason), 0L, 1L));
-      Task.scheduleSyncRepeatingTask(new YinYang$1(this, taskHelper, items, stands, world, targetLocation, sender, target, type, reason), 0L, 1L);
+      Task.scheduleSyncRepeatingTask(new YinYang$1(this, taskHelper, items, stands, world, targetLocation, sender, target, type, reason), 10L, 1L);
    }
 
    private Location[] getSpawnLocations(Location location) {

@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 class YinYang$1 extends BukkitRunnable {
-   float radPerSec;
+   double radPerSec;
    double yDif;
    boolean up;
    final RepeatingTaskHelper taskHelper;
@@ -42,7 +42,7 @@ class YinYang$1 extends BukkitRunnable {
       this.target = var8;
       this.type = var9;
       this.reason = var10;
-      this.radPerSec = 1.0F;
+      this.radPerSec = Math.toRadians(10);
       this.yDif = 0.0D;
       this.up = true;
    }
@@ -72,7 +72,7 @@ class YinYang$1 extends BukkitRunnable {
 
          for(int var10 = 0; var10 < var3; ++var10) {
             ArmorStand stand = var8[var10];
-            Location nextPoint = Utils.getLocationAroundCircle(this.targetLocation, (double)YinYang.getRadius(this.animation), (double)(this.radPerSec / 20.0F * (float)this.taskHelper.getCounter() + (float)count));
+            Location nextPoint = Utils.getLocationAroundCircle(this.targetLocation, YinYang.getRadius(this.animation), this.radPerSec * (float)this.taskHelper.getCounter() + (float)count);
             if (count == 0) {
                stand.teleport(new Location(this.world, nextPoint.getX(), nextPoint.getY() + this.yDif, nextPoint.getZ()));
             } else {
@@ -82,24 +82,26 @@ class YinYang$1 extends BukkitRunnable {
             count += 3;
          }
 
-         this.radPerSec = (float)((double)this.radPerSec + 0.06D);
-         if (this.yDif >= 0.7D) {
+         this.radPerSec = this.radPerSec;
+         if (this.yDif >= 0.8D) {
             this.up = false;
-         } else if (this.yDif <= -0.7D) {
+         } else if (this.yDif <= -0.8D) {
             this.up = true;
          }
 
          if (this.up) {
-            this.yDif += 0.01D;
+            this.yDif += 0.02D;
          } else {
-            this.yDif -= 0.01D;
+            this.yDif -= 0.02D;
          }
 
          Item item;
+         Location loc = new Location(this.world,this.target.getEyeLocation().getX()-0.5F,this.target.getEyeLocation().getY(),this.target.getEyeLocation().getZ()-0.5F);
          if (this.animation.getRandom().nextInt(2) == 0) {
-            item = this.target.getWorld().dropItemNaturally(this.target.getEyeLocation(), YinYang.getBlackWool(this.animation));
+
+            item = this.target.getWorld().dropItemNaturally(loc, YinYang.getBlackWool(this.animation));
          } else {
-            item = this.target.getWorld().dropItemNaturally(this.target.getEyeLocation(), YinYang.getWhiteWool(this.animation));
+            item = this.target.getWorld().dropItemNaturally(loc, YinYang.getWhiteWool(this.animation));
          }
 
          Utils.setLore(item.getItemStack(), this.animation.getRandom().nextDouble() + "");
