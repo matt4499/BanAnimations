@@ -1,5 +1,5 @@
 name: BanAnimations
-version: '${project.version}'
+version: @version@
 main: me.phantom.bananimations.BanAnimations
 api-version: 1.17
 prefix: BanAnims
