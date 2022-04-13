@@ -1,10 +1,5 @@
 package me.phantom.bananimations.animations;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import me.phantom.bananimations.AnimationType;
 import me.phantom.bananimations.api.Animation;
 import me.phantom.bananimations.utils.ArmorStandBuilder;
@@ -22,22 +17,25 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
 public class SwordFallAnimation extends Animation {
-   private ArmorStandBuilder ab;
+   private final ArmorStandBuilder ab;
 
    public SwordFallAnimation() {
       super("swordfall");
-      this.ab = (new ArmorStandBuilder(this.getPlugin(), (Location)null)).withInvisible().holding(new ItemStack(Material.DIAMOND_SWORD));
+      this.ab = (new ArmorStandBuilder(this.getPlugin(), null)).withInvisible().holding(new ItemStack(Material.DIAMOND_SWORD));
    }
 
    public void playAnimation(CommandSender sender, Player target, AnimationType type, String reason) {
       super.freeze(target);
       List<ArmorStand> stands = this.spawnStands(this.getRandomLocations(target.getLocation().add(0.0D, 10.0D, 0.0D)), target.getLocation());
       Task.runTaskLater(() -> {
-         Iterator<ArmorStand> var6 = stands.iterator();
 
-         while(var6.hasNext()) {
-            ArmorStand stand = (ArmorStand)var6.next();
+         for (ArmorStand stand : stands) {
             stand.remove();
          }
 
@@ -46,7 +44,7 @@ public class SwordFallAnimation extends Animation {
    }
 
    private List<ArmorStand> spawnStands(Location[] locations, Location targetLocation) {
-      ArrayList<ArmorStand> stands = new ArrayList<ArmorStand>();
+      ArrayList<ArmorStand> stands = new ArrayList<>();
       World world = targetLocation.getWorld();
       double x = targetLocation.getX();
       double y = targetLocation.getY() + 1.0D;
@@ -64,10 +62,11 @@ public class SwordFallAnimation extends Animation {
 
          taskHelper.increment();
          if (stands.size() > 4) {
-            ((ArmorStand)stands.get(0)).getWorld().playSound(((ArmorStand)stands.get(0)).getLocation(), Sounds.ENTITY_PLAYER_HURT.get(), 0.3F, 1.0F);
-            ((ArmorStand)stands.get(0)).remove();
+            stands.get(0).getWorld().playSound(stands.get(0).getLocation(), Sounds.ENTITY_PLAYER_HURT.get(), 0.3F, 1.0F);
+            stands.get(0).remove();
             stands.remove(0);
             if (taskHelper.getCounter() % 4 == 0) {
+               assert world != null;
                world.playEffect(new Location(world, x + this.getRandom().nextDouble() - 0.5D, y, z + this.getRandom().nextDouble() - 0.5D), Effect.STEP_SOUND, 152);
             }
          }

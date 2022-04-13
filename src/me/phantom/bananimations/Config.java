@@ -3,7 +3,7 @@ package me.phantom.bananimations;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class Config {
-   private BanAnimations plugin;
+   private final BanAnimations plugin;
 
    public Config(BanAnimations plugin) {
       this.plugin = plugin;
@@ -11,7 +11,6 @@ public class Config {
 
    public void loadDefaultConfig() {
       FileConfiguration configuration = this.plugin.getConfig();
-      configuration.options().header("BanAnimations Configuration\n Created by Phantom_ & Patched by Matt4499\n \nValid animations: CAGE, CARFALL, EXPLODE, FREEZE, GWEN, LIGHTNING, METEOR, PIG, SNAPTRAP, SPIT, SWORDFALL, YINYANG");
       configuration.addDefault("play_animation_on.BAN.enabled", true);
       configuration.addDefault("play_animation_on.BAN.animation", "YINYANG");
       configuration.addDefault("play_animation_on.IP_BAN.enabled", true);

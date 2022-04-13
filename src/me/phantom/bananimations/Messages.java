@@ -19,10 +19,10 @@ public enum Messages {
    ERROR_INVALID_ANIMATION("invalid_animation_name"),
    ERROR_CANT_PLAY_ANIMATION_ON_PLAYER("player_animation_bypass_enabled");
 
-   private String location;
+   private final String location;
    private static FileConfiguration file;
 
-   private Messages(String location) {
+   Messages(String location) {
       this.location = location;
    }
 

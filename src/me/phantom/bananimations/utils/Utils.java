@@ -18,6 +18,7 @@ public class Utils {
       ItemMeta meta = item.getItemMeta();
       List<String> lore = new ArrayList<String>();
       lore.add("ba-" + s);
+      assert meta != null;
       meta.setLore(lore);
       item.setItemMeta(meta);
    }

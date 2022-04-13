@@ -20,34 +20,34 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class MeteorAnimation extends Animation {
-   private ArmorStandBuilder smallMeteor;
-   private ArmorStandBuilder largeMeteor;
+   private final ArmorStandBuilder smallMeteor;
+   private final ArmorStandBuilder largeMeteor;
 
    public MeteorAnimation() {
       super("meteor");
-      this.largeMeteor = (new ArmorStandBuilder(this.getPlugin(), (Location)null)).withHelmet(new ItemStack(Material.COAL_BLOCK)).withInvisible();
-      this.smallMeteor = (new ArmorStandBuilder(this.getPlugin(), (Location)null)).withHelmet(new ItemStack(Material.COAL_BLOCK)).withInvisible().withSmall();
+      this.largeMeteor = (new ArmorStandBuilder(this.getPlugin(), null)).withHelmet(new ItemStack(Material.COAL_BLOCK)).withInvisible();
+      this.smallMeteor = (new ArmorStandBuilder(this.getPlugin(), null)).withHelmet(new ItemStack(Material.COAL_BLOCK)).withInvisible().withSmall();
    }
 
    public void playAnimation(CommandSender sender, Player target, AnimationType type, String reason) {
       super.freeze(target);
       World world = target.getWorld();
-      List<ArmorStand> stands = new ArrayList<ArmorStand>();
+      ArrayList<ArmorStand> stands = new ArrayList<>();
       Location[] locations = this.getRandomLocations(target.getLocation());
       RepeatingTaskHelper taskHelper = new RepeatingTaskHelper();
       int trailID = this.playMeteorTrail(stands);
       taskHelper.setTaskID(Task.scheduleSyncRepeatingTask(() -> {
          if (stands.size() > 4) {
-            world.playEffect(((ArmorStand)stands.get(0)).getEyeLocation(), Effect.valueOf("SMOKE"), 1);
-            world.playSound(((ArmorStand)stands.get(0)).getEyeLocation(), Sounds.ENTITY_GENERIC_EXPLODE.get(), 0.3F, 1.0F);
-            ((ArmorStand)stands.get(0)).remove();
+            world.playEffect(stands.get(0).getEyeLocation(), Effect.valueOf("SMOKE"), 1);
+            world.playSound(stands.get(0).getEyeLocation(), Sounds.ENTITY_GENERIC_EXPLODE.get(), 0.3F, 1.0F);
+            stands.get(0).remove();
             stands.remove(0);
          }
 
          ArmorStand stand;
          if (taskHelper.getCounter() > 29) {
             if (taskHelper.getCounter() == 33) {
-               stand = (ArmorStand)stands.get(0);
+               stand = stands.get(0);
                world.playEffect(stand.getLocation(), Effect.valueOf("SMOKE"), 1);
                world.playSound(stand.getEyeLocation(), Sounds.ENTITY_GENERIC_EXPLODE.get(), 0.3F, 1.0F);
                stand.remove();
@@ -56,8 +56,8 @@ public class MeteorAnimation extends Animation {
                taskHelper.cancel();
             }
 
-            ((ArmorStand)stands.get(0)).getWorld().playEffect(((ArmorStand)stands.get(0)).getEyeLocation(), Effect.valueOf("SMOKE"), 1);
-            ((ArmorStand)stands.get(0)).remove();
+            stands.get(0).getWorld().playEffect(stands.get(0).getEyeLocation(), Effect.valueOf("SMOKE"), 1);
+            stands.get(0).remove();
             stands.remove(0);
          } else if (taskHelper.getCounter() == 29) {
             stand = (ArmorStand)this.getPlugin().getMobUtils().setDefaultTags(this.largeMeteor.withLocation(locations[taskHelper.getCounter()]).spawn());
@@ -82,12 +82,7 @@ public class MeteorAnimation extends Animation {
    }
 
    private int playMeteorTrail(List<ArmorStand> stands) {
-      int id = Task.scheduleSyncRepeatingTask(() -> {
-         stands.forEach((stand) -> {
-            stand.getWorld().playEffect(stand.getLocation(), Effect.SMOKE, 2);
-         });
-      }, 0L, 2L);
-      return id;
+      return Task.scheduleSyncRepeatingTask(() -> stands.forEach((stand) -> stand.getWorld().playEffect(stand.getLocation(), Effect.SMOKE, 2)), 0L, 2L);
    }
 
    private Location[] getRandomLocations(Location targetLocation) {

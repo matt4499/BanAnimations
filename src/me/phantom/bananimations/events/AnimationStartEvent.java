@@ -6,20 +6,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import javax.annotation.Nonnull;
+
+@SuppressWarnings("ALL")
 public class AnimationStartEvent extends Event {
    private static final HandlerList handlers = new HandlerList();
-   private CommandSender sender;
-   private Player target;
-   private AnimationType type;
-   private String reason;
-   private String animationName;
+   private final CommandSender sender;
+   private final Player target;
+   private final AnimationType type;
+   private final String reason;
 
-   public AnimationStartEvent(CommandSender sender, Player target, AnimationType type, String reason, String animationName) {
+   public AnimationStartEvent(CommandSender sender, Player target, AnimationType type, String reason) {
       this.sender = sender;
       this.target = target;
       this.type = type;
       this.reason = reason;
-      this.animationName = animationName;
    }
 
    public CommandSender getSender() {
@@ -38,11 +39,7 @@ public class AnimationStartEvent extends Event {
       return this.reason;
    }
 
-   public String getAnimationName() {
-      return this.animationName;
-   }
-
-   public HandlerList getHandlers() {
+   public @Nonnull HandlerList getHandlers() {
       return handlers;
    }
 

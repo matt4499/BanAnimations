@@ -18,9 +18,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 public abstract class Animation {
-   private String name;
-   private Random random;
-   private BanAnimations plugin;
+   private final String name;
+   private final Random random;
+   private final BanAnimations plugin;
 
    public Animation(String name) {
       this.name = name;
@@ -29,7 +29,7 @@ public abstract class Animation {
    }
 
    public void callAnimation(CommandSender sender, Player target, AnimationType type, String reason) {
-      Bukkit.getServer().getPluginManager().callEvent(new AnimationStartEvent(sender, target, type, reason, this.name));
+      Bukkit.getServer().getPluginManager().callEvent(new AnimationStartEvent(sender, target, type, reason));
       this.playAnimation(sender, target, type, reason);
    }
 
@@ -52,8 +52,7 @@ public abstract class Animation {
 
    public void playSound(Player target, CommandSender sender, Sound sound, float volume, float pitch) {
       target.playSound(target.getEyeLocation(), sound, volume, pitch);
-      if (sender instanceof Player) {
-         Player player = (Player) sender;
+      if (sender instanceof Player player) {
          player.playSound(player.getEyeLocation(), sound, volume, pitch);
       }
 
@@ -69,7 +68,7 @@ public abstract class Animation {
          }
          Location targetLocation = target.getLocation();
          Location teleportLocation = new Location(targetLocation.getWorld(), targetLocation.getX(),
-               (double) targetLocation.getBlockY(), targetLocation.getZ());
+                 targetLocation.getBlockY(), targetLocation.getZ());
          teleportLocation.setDirection(targetLocation.getDirection());
          target.teleport(targetLocation);
       }

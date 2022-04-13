@@ -12,8 +12,8 @@ public final class Task {
       plugin.getServer().getScheduler();
    }
 
-   public static BukkitTask runTaskLater(Runnable run, long delay, TimeUnit unit) {
-      return Bukkit.getScheduler().runTaskLater(plugin, run, unit.toSeconds(delay) * 20L);
+   public static void runTaskLater(Runnable run, long delay, TimeUnit unit) {
+      Bukkit.getScheduler().runTaskLater(plugin, run, unit.toSeconds(delay) * 20L);
    }
 
    public static BukkitTask runTaskTimer(Runnable run, long start, long repeat) {

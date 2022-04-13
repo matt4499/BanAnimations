@@ -19,7 +19,7 @@ public class ExplodeAnimation extends Animation {
    public void playAnimation(CommandSender sender, Player target, AnimationType type, String reason) {
       super.freeze(target);
       Location tntSpawnLocation = target.getLocation().add(0.0D, 10.0D, 0.0D);
-      TNTPrimed tnt = (TNTPrimed)target.getWorld().spawn(tntSpawnLocation, TNTPrimed.class);
+      TNTPrimed tnt = target.getWorld().spawn(tntSpawnLocation, TNTPrimed.class);
       target.getWorld().playSound(target.getEyeLocation(), Sounds.ENTITY_TNT_PRIMED.get(), 1.0F, 1.0F);
       tnt.setFuseTicks(200);
       Task.runTaskLater(() -> {

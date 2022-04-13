@@ -1,9 +1,6 @@
 package me.phantom.bananimations;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 import me.phantom.bananimations.animations.CageAnimation;
 import me.phantom.bananimations.animations.CarFallAnimation;
@@ -18,6 +15,7 @@ import me.phantom.bananimations.animations.SpitAnimation;
 import me.phantom.bananimations.animations.SwordFallAnimation;
 import me.phantom.bananimations.animations.YinYang;
 import me.phantom.bananimations.api.Animation;
+import me.phantom.bananimations.commands.BATabCompletion;
 import me.phantom.bananimations.commands.BanAnimationsCommand;
 import me.phantom.bananimations.listeners.AnimationListeners;
 import me.phantom.bananimations.listeners.AutoAnimationListener;
@@ -31,11 +29,11 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class BanAnimations extends JavaPlugin {
-   private HashMap<String, Animation> animations = new HashMap<String, Animation>();
-   private ArrayList<Player> frozenPlayers = new ArrayList<Player>();
+   public static final HashMap<String, Animation> animations = new HashMap<>();
+   private final ArrayList<Player> frozenPlayers = new ArrayList<>();
    private Random random;
    private MobUtils mobUtils;
-   private Config config = new Config(this);
+   private final Config config = new Config(this);
 
    public Logger logger;
 
@@ -58,7 +56,8 @@ public class BanAnimations extends JavaPlugin {
    }
 
    public void registerCommands() {
-      Bukkit.getPluginCommand("bananimations").setExecutor(new BanAnimationsCommand(this));
+      Objects.requireNonNull(getCommand("bananimations")).setExecutor(new BanAnimationsCommand(this));
+      Objects.requireNonNull(getCommand("bananimations")).setTabCompleter(new BATabCompletion());
    }
 
    public void registerEvents() {
@@ -96,28 +95,28 @@ public class BanAnimations extends JavaPlugin {
    }
 
    public void registerAnimation(Animation animation, String name) {
-      this.animations.put(name, animation);
+      animations.put(name, animation);
       logger.info("Animation " + name + " has been loaded!");
    }
 
    public boolean isValidAnimation(String animation) {
       if (animation == null) {
-         return false;
+         return true;
       } else {
-         return animation.equals("random") || this.animations.containsKey(animation);
+         return !animation.equals("random") && !animations.containsKey(animation);
       }
    }
 
    public Animation getAnimation(String animationName) {
-      return (Animation) this.animations.get(animationName);
+      return animations.get(animationName);
    }
 
    public Set<String> getAnimationNames() {
-      return this.animations.keySet();
+      return animations.keySet();
    }
 
    public Animation getRandomAnimation() {
-      Object[] values = this.animations.values().toArray();
+      Object[] values = animations.values().toArray();
       return (Animation) values[this.random.nextInt(values.length)];
    }
 

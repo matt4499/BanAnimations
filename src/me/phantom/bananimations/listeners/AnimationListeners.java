@@ -14,22 +14,19 @@ public class AnimationListeners implements Listener {
          event.getEntity().remove();
          event.setCancelled(true);
       }
-
    }
-
    @EventHandler
    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
-      if (event.getRightClicked() instanceof ArmorStand && event.getRightClicked().getName() != null && event.getRightClicked().getName().equals("ba-stand")) {
-         event.setCancelled(true);
+      if (event.getRightClicked() instanceof ArmorStand) {
+         if (event.getRightClicked().getName().equals("ba-stand")) {
+            event.setCancelled(true);
+         }
       }
-
    }
-
    @EventHandler
    public void onEntityDamageEntityEvent(EntityDamageByEntityEvent event) {
       if (event.getDamager().getCustomName() != null && (event.getDamager().getCustomName().equals("ba-fangs") || event.getDamager().getCustomName().equalsIgnoreCase("bananimations-guardian"))) {
          event.setCancelled(true);
       }
-
    }
 }

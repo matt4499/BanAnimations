@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public class PigAnimation extends Animation {
-   private ItemStack itemPork;
+   private final ItemStack itemPork;
 
    public PigAnimation() {
       super("pig");
@@ -31,7 +31,7 @@ public class PigAnimation extends Animation {
       Location location = target.getLocation();
       location.setDirection(target.getLocation().getDirection());
       Pig pig = (Pig)target.getWorld().spawnEntity(location, EntityType.PIG);
-      this.getPlugin().getMobUtils().setTags(pig, new String[]{"Invulnerable", "Silent", "NoAI"});
+      this.getPlugin().getMobUtils().setTags(pig, "Invulnerable", "Silent", "NoAI");
       pig.teleport(location);
       pig.setAdult();
       pig.setCustomName(target.getName());
@@ -51,11 +51,7 @@ public class PigAnimation extends Animation {
          this.playSound(target, sender, Sounds.ENTITY_PIG_DEATH.get(), 0.5F, 1.0F);
       }, 1L, TimeUnit.SECONDS);
       Task.runTaskLater(() -> {
-         Item[] var6 = items;
-         int var7 = items.length;
-
-         for(int var8 = 0; var8 < var7; ++var8) {
-            Item item = var6[var8];
+         for (Item item : items) {
             item.remove();
          }
 

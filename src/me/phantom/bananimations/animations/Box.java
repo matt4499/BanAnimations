@@ -1,7 +1,6 @@
  package me.phantom.bananimations.animations;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import me.phantom.bananimations.AnimationType;
 import me.phantom.bananimations.api.Animation;
@@ -13,29 +12,28 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class Box extends Animation {
-   private ArmorStandBuilder ab;
+   private final ArmorStandBuilder ab;
 
    public Box(String animationName, Material type) {
       super(animationName);
-      this.ab = (new ArmorStandBuilder(this.getPlugin(), (Location)null)).withNoGravity().withNoArms().withInvisible().withHelmet(new ItemStack(type));
+      this.ab = (new ArmorStandBuilder(this.getPlugin(), null)).withNoGravity().withNoArms().withInvisible().withHelmet(new ItemStack(type));
    }
 
    public void playAnimation(CommandSender sender, Player target, AnimationType type, String reason) {
       super.freeze(target);
       Location targetLoc = target.getLocation().add(0.0D, -1.305D, 0.0D);
-      List<ArmorStand> stands = new ArrayList<ArmorStand>();
+      ArrayList<ArmorStand> stands = new ArrayList<>();
 
       for(int i = 0; i < 3; ++i) {
-         Location[] var8 = this.getSquareAroundLocation(targetLoc);
-         int var9 = var8.length;
+         Location[] squareAroundLocation = this.getSquareAroundLocation(targetLoc);
 
-         for(int var10 = 0; var10 < var9; ++var10) {
-            Location location = var8[var10];
-            stands.add((ArmorStand)this.getPlugin().getMobUtils().setDefaultTags(this.ab.withLocation(location).spawn()));
+         for (Location location : squareAroundLocation) {
+            stands.add((ArmorStand) this.getPlugin().getMobUtils().setDefaultTags(this.ab.withLocation(location).spawn()));
          }
 
          targetLoc.add(0.0D, 0.61D, 0.0D);
@@ -48,9 +46,7 @@ public class Box extends Animation {
       }
 
       Task.runTaskLater(() -> {
-         stands.forEach((stand) -> {
-            stand.remove();
-         });
+         stands.forEach(Entity::remove);
          super.finish(sender, target, type, reason);
       }, 5L, TimeUnit.SECONDS);
    }

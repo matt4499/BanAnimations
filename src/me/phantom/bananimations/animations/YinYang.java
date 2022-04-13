@@ -19,18 +19,18 @@ import me.phantom.bananimations.utils.RepeatingTaskHelper;
 import me.phantom.bananimations.utils.Task;
 
 public class YinYang extends Animation {
-   private ItemStack whiteWool;
-   private ItemStack blackWool;
-   private ArmorStandBuilder whiteAB;
-   private ArmorStandBuilder blackAB;
+   private final ItemStack whiteWool;
+   private final ItemStack blackWool;
+   private final ArmorStandBuilder whiteAB;
+   private final ArmorStandBuilder blackAB;
    private final float radius;
 
    public YinYang() {
       super("yinyang");
       this.whiteWool = new ItemStack(Material.WHITE_WOOL);
       this.blackWool = new ItemStack(Material.BLACK_WOOL);
-      this.whiteAB = (new ArmorStandBuilder(this.getPlugin(), (Location)null)).withInvisible().withNoGravity().withHelmet(this.whiteWool);
-      this.blackAB = (new ArmorStandBuilder(this.getPlugin(), (Location)null)).withInvisible().withNoGravity().withHelmet(this.blackWool);
+      this.whiteAB = (new ArmorStandBuilder(this.getPlugin(), null)).withInvisible().withNoGravity().withHelmet(this.whiteWool);
+      this.blackAB = (new ArmorStandBuilder(this.getPlugin(), null)).withInvisible().withNoGravity().withHelmet(this.blackWool);
       this.radius = 1.5F;
    }
 
@@ -42,10 +42,9 @@ public void playAnimation(CommandSender sender, Player target, AnimationType typ
       Location[] locations = this.getSpawnLocations(targetLocation);
       stands[0] = this.whiteAB.withLocation(locations[0]).spawn();
       stands[1] = this.blackAB.withLocation(locations[1]).spawn();
-      List<Item> items = new ArrayList<Item>();
+      List<Item> items = new ArrayList<>();
       RepeatingTaskHelper taskHelper = new RepeatingTaskHelper();
-      //taskHelper.setTaskID(Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this.getPlugin(), new YinYang$1(this, taskHelper, items, stands, world, targetLocation, sender, target, type, reason), 0L, 1L));
-      Task.scheduleSyncRepeatingTask(new YinYang$1(this, taskHelper, items, stands, world, targetLocation, sender, target, type, reason), 0L, 1L);
+     Task.scheduleSyncRepeatingTask(new YinYang$1(this, taskHelper, items, stands, world, targetLocation, sender, target, type, reason), 0L, 1L);
    }
 
    private Location[] getSpawnLocations(Location location) {
@@ -53,11 +52,10 @@ public void playAnimation(CommandSender sender, Player target, AnimationType typ
       double x = location.getX();
       double y = location.getY();
       double z = location.getZ();
-      Location[] locations = new Location[]{new Location(world, x, y, z), new Location(world, x, y, z)};
-      return locations;
+       return new Location[]{new Location(world, x, y, z), new Location(world, x, y, z)};
    }
-   static boolean finish(YinYang animation, CommandSender sender, Player player, AnimationType aniType, String reason) {
-      return animation.finish(sender, player, aniType, reason);
+   static void finish(YinYang animation, CommandSender sender, Player player, AnimationType aniType, String reason) {
+       animation.finish(sender, player, aniType, reason);
    }
    static float getRadius(YinYang animation) {
       return animation.radius;

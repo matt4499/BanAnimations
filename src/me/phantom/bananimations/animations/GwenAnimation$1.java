@@ -12,7 +12,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Guardian;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -53,7 +52,7 @@ class GwenAnimation$1 extends BukkitRunnable {
          Location[] guardians = GwenAnimation.getLocationCross(this.animation, this.guardianCenter);
          int guardsLength = guardians.length;
          for (int target = 0; target < guardsLength; ++target) {
-            Guardian guardian = (Guardian) this.guardians.get(target);
+            Guardian guardian = this.guardians.get(target);
             guardian.remove();
          }
          this.taskHelper.cancel();
@@ -69,12 +68,10 @@ class GwenAnimation$1 extends BukkitRunnable {
          Location standLocation = this.stand.getEyeLocation();
          this.stand.remove();
          Location[] guardians = GwenAnimation.getLocationCross(this.animation, this.guardianCenter);
-         int sender = guardians.length;
 
-         for (int target = 0; target < sender; ++target) {
-            Location location = guardians[target];
-            Guardian guardian = (Guardian) this.guardians.get(count);
-            guardian.setTarget((LivingEntity) null);
+         for (Location location : guardians) {
+            Guardian guardian = this.guardians.get(count);
+            guardian.setTarget(null);
             guardian.setTarget(this.stand);
             guardian.setVelocity(new Vector(0, 0, 0));
             location.setDirection(standLocation.clone().toVector().subtract(location.toVector()));
@@ -85,9 +82,9 @@ class GwenAnimation$1 extends BukkitRunnable {
          double radSpot = 0.0D;
 
          for (Iterator<Guardian> location = this.guardians.iterator(); location.hasNext(); ++radSpot) {
-            Guardian guardian = (Guardian) location.next();
+            Guardian guardian = location.next();
             guardian.teleport(
-                  Utils.getLocationAroundCircle(this.guardianCenter, (double) GwenAnimation.getRadius(this.animation),
+                  Utils.getLocationAroundCircle(this.guardianCenter, GwenAnimation.getRadius(this.animation),
                         (double) (this.radPerSec / 20.0F * (float) this.taskHelper.getCounter()) + radSpot));
             guardian.setTarget(this.stand);
          }

@@ -13,11 +13,11 @@ public enum Sounds {
    ENTITY_GENERIC_EXPLODE("ENTITY_GENERIC_EXPLODE", "EXPLODE"),
    ENTITY_PIG_DEATH("ENTITY_PIG_DEATH", "PIG_DEATH");
 
-   private String newSound;
-   private String oldSound;
-   private boolean isNewSound = !Bukkit.getVersion().contains("1.8");
+   private final String newSound;
+   private final String oldSound;
+   private final boolean isNewSound = !Bukkit.getVersion().contains("1.8");
 
-   private Sounds(String newSound, String oldSound) {
+   Sounds(String newSound, String oldSound) {
       this.newSound = newSound;
       this.oldSound = oldSound;
    }

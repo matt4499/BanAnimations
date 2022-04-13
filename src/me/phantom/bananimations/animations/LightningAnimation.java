@@ -53,14 +53,9 @@ public class LightningAnimation extends Animation {
          taskHelper.increment();
       }, 0L, 20L));
       Task.runTaskLater(() -> {
-         Item[] var1 = items;
-         int var2 = items.length;
-
-         for(int var3 = 0; var3 < var2; ++var3) {
-            Item item = var1[var3];
+         for (Item item : items) {
             item.remove();
          }
-
       }, 5L, TimeUnit.SECONDS);
    }
 

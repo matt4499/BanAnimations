@@ -9,7 +9,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class FrozenListener implements Listener {
-   private BanAnimations plugin;
+   private final BanAnimations plugin;
 
    public FrozenListener(BanAnimations plugin) {
       this.plugin = plugin;

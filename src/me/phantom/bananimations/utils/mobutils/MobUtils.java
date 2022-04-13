@@ -4,7 +4,7 @@ import me.phantom.bananimations.BanAnimations;
 import org.bukkit.entity.Entity;
 
 public class MobUtils {
-   private MobUtil mobUtil;
+   private final MobUtil mobUtil;
 
    public MobUtils(BanAnimations plugin) {
       this.mobUtil = new MobUtilsNewer();

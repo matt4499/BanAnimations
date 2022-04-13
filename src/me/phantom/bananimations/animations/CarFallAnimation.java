@@ -12,41 +12,39 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 
 public class CarFallAnimation extends Animation {
-   private Material[] typeOrderBase = new Material[5];
-   private Material[] typeOrderFace = new Material[3];
+   private final Material[] typeOrderBase = new Material[5];
+   private final Material[] typeOrderFace = new Material[3];
 
    public CarFallAnimation() {
       super("carfall");
       this.loadTypes();
    }
 
-   @SuppressWarnings("deprecation")
 public void playAnimation(CommandSender sender, Player target, AnimationType type, String reason) {
       super.freeze(target);
       World world = target.getWorld();
       Location targetLocation = target.getLocation();
-      List<FallingBlock> blocks = new ArrayList<FallingBlock>();
+      List<FallingBlock> blocks = new ArrayList<>();
       Location[] blockLocations = this.getLocationsBase(targetLocation.add(0.0D, 10.0D, 0.0D));
 
       int i;
       for(i = 0; i < 15; ++i) {
-         blocks.add(this.setAttributes(world.spawnFallingBlock(blockLocations[i], this.typeOrderBase[i % 5], (byte)14)));
+         blocks.add(this.setAttributes(world.spawnFallingBlock(blockLocations[i], this.typeOrderBase[i % 5].createBlockData())));
       }
 
       blockLocations = this.getLocationsFace(targetLocation.add(0.0D, 2.0D, -1.0D));
 
       for(i = 0; i < 9; ++i) {
-         blocks.add(this.setAttributes(world.spawnFallingBlock(blockLocations[i], this.typeOrderFace[i % 3], (byte)14)));
+         blocks.add(this.setAttributes(world.spawnFallingBlock(blockLocations[i], this.typeOrderFace[i % 3].createBlockData())));
       }
 
       Task.runTaskLater(() -> {
-         blocks.forEach((fallingBlock) -> {
-            fallingBlock.remove();
-         });
+         blocks.forEach(Entity::remove);
          world.playEffect(target.getLocation(), Effect.valueOf("SMOKE"), 1);
          world.playSound(target.getLocation(), Sounds.ENTITY_GENERIC_EXPLODE.get(), 0.5F, 1.0F);
          super.finish(sender, target, type, reason);

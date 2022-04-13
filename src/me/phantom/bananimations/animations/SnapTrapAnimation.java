@@ -31,7 +31,7 @@ public class SnapTrapAnimation extends Animation {
             taskHelper.cancel();
          }
 
-         Utils.getCircle(targetLocation, (double)(3 - taskHelper.getCounter()), (3 - taskHelper.getCounter()) * 5).forEach((location) -> {
+         Utils.getCircle(targetLocation, 3 - taskHelper.getCounter(), (3 - taskHelper.getCounter()) * 5).forEach((location) -> {
             EvokerFangs fangs = (EvokerFangs)world.spawnEntity(location, EntityType.EVOKER_FANGS);
             fangs.setCustomNameVisible(false);
             fangs.setCustomName("ba-fangs");

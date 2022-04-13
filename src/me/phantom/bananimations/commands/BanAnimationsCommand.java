@@ -11,14 +11,16 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
+
 public class BanAnimationsCommand implements CommandExecutor {
-   private BanAnimations plugin;
+   private final BanAnimations plugin;
 
    public BanAnimationsCommand(BanAnimations plugin) {
       this.plugin = plugin;
    }
 
-   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+   public boolean onCommand(@Nonnull CommandSender sender, @Nonnull Command command, String label, @Nonnull String[] args) {
       if (label.equalsIgnoreCase("ba") || label.equalsIgnoreCase("bananimations")) {
          if (!sender.hasPermission("bananimations.ban") || !sender.hasPermission("bananimations.kick") || !sender.hasPermission("bananimations.mute")) {
             Messages.NO_PERMS.send(sender);
@@ -86,36 +88,37 @@ public class BanAnimationsCommand implements CommandExecutor {
                }
 
                if (Bukkit.getPlayer(args[1]) == null) {
-                  Messages.ERROR_PLAYER_NOT_ONLINE.send(sender, new String[]{args[1]});
+                  Messages.ERROR_PLAYER_NOT_ONLINE.send(sender, args[1]);
                   return false;
                }
 
                Player player = Bukkit.getPlayer(args[1]);
+               assert player != null;
                if (player.hasPermission("bananimations.bypass")) {
-                  Messages.ERROR_CANT_PLAY_ANIMATION_ON_PLAYER.send(sender, new String[]{player.getName()});
+                  Messages.ERROR_CANT_PLAY_ANIMATION_ON_PLAYER.send(sender, player.getName());
                   return false;
                }
 
                if (this.plugin.isFrozen(player)) {
-                  Messages.ERROR_PLAYER_ALREADY_IN_ANIMATION.send(sender, new String[]{args[1]});
+                  Messages.ERROR_PLAYER_ALREADY_IN_ANIMATION.send(sender, args[1]);
                   return false;
                }
 
                animationName = args[2].toLowerCase();
-               if (!this.plugin.isValidAnimation(animationName)) {
-                  Messages.ERROR_INVALID_ANIMATION.send(sender, new String[]{animationName});
+               if (this.plugin.isValidAnimation(animationName)) {
+                  Messages.ERROR_INVALID_ANIMATION.send(sender, animationName);
                   return false;
                }
 
-               String reason = "";
+               StringBuilder reason = new StringBuilder();
                if (args.length > 3) {
                   for(int i = 3; i < args.length; ++i) {
-                     reason = reason + args[i] + " ";
+                     reason.append(args[i]).append(" ");
                   }
                }
 
-               Messages.ANIMATION_START_MESSAGE.send(sender, new String[]{animationName, player.getName()});
-               this.activateAnimation(sender, player, animationName, type, reason);
+               Messages.ANIMATION_START_MESSAGE.send(sender, animationName, player.getName());
+               this.activateAnimation(sender, player, animationName, type, reason.toString());
                return true;
             }
 

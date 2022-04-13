@@ -13,11 +13,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Guardian;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class GwenAnimation extends Animation {
-   private ArmorStandBuilder ab = (new ArmorStandBuilder(this.getPlugin(), (Location) null)).withInvisible().withNoGravity();
+   private final ArmorStandBuilder ab = (new ArmorStandBuilder(this.getPlugin(), null)).withInvisible().withNoGravity();
    private final float radius = 3.0F;
 
    public GwenAnimation() {
@@ -30,14 +29,13 @@ public class GwenAnimation extends Animation {
       World world = targetLocation.getWorld();
       ArmorStand stand = this.ab.withLocation(targetLocation).spawn();
       Location guardianCenter = targetLocation.clone().add(0.0D, 6.0D, 0.0D);
-      List<Guardian> guardians = new ArrayList<Guardian>();
+      List<Guardian> guardians = new ArrayList<>();
       Location[] locationsCross = this.getLocationsCross(guardianCenter);
-      int locationCrossLength = locationsCross.length;
 
-      for (int i = 0; i < locationCrossLength; ++i) {
-         Location location = locationsCross[i];
+      for (Location location : locationsCross) {
+         assert world != null;
          Guardian guardian = (Guardian) world.spawnEntity(location, EntityType.GUARDIAN);
-         guardian.setTarget((LivingEntity) null);
+         guardian.setTarget(null);
          guardian.setTarget(stand);
          this.getPlugin().getMobUtils().setDefaultTags(guardian);
          guardian.setGravity(false);
@@ -57,12 +55,11 @@ public class GwenAnimation extends Animation {
       double x = center.getX();
       double y = center.getY();
       double z = center.getZ();
-      Location[] cross = new Location[] { new Location(world, x + 3.0D, y, z), new Location(world, x, y, z + 3.0D), new Location(world, x - 3.0D, y, z), new Location(world, x, y, z - 3.0D) };
-      return cross;
+      return new Location[] { new Location(world, x + 3.0D, y, z), new Location(world, x, y, z + 3.0D), new Location(world, x - 3.0D, y, z), new Location(world, x, y, z - 3.0D) };
    }
 
-   static boolean finish(GwenAnimation animation, CommandSender sender, Player player, AnimationType aniType, String reason) {
-      return animation.finish(sender, player, aniType, reason);
+   static void finish(GwenAnimation animation, CommandSender sender, Player player, AnimationType aniType, String reason) {
+      animation.finish(sender, player, aniType, reason);
    }
 
    static Location[] getLocationCross(GwenAnimation animation, Location x1) {

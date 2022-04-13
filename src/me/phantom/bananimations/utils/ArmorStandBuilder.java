@@ -7,8 +7,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 
+import java.util.Objects;
+
 public class ArmorStandBuilder {
-   private BanAnimations plugin;
+   private final BanAnimations plugin;
    private Location location;
    private ItemStack helmet;
    private ItemStack chestplate;
@@ -48,21 +50,6 @@ public class ArmorStandBuilder {
       return this;
    }
 
-   public ArmorStandBuilder withChestplate(ItemStack chestplate) {
-      this.chestplate = chestplate;
-      return this;
-   }
-
-   public ArmorStandBuilder withLeggings(ItemStack leggings) {
-      this.leggings = leggings;
-      return this;
-   }
-
-   public ArmorStandBuilder withBoots(ItemStack boots) {
-      this.boots = boots;
-      return this;
-   }
-
    public ArmorStandBuilder withNoGravity() {
       this.gravity = false;
       return this;
@@ -82,60 +69,22 @@ public class ArmorStandBuilder {
       this.location = location;
       return this;
    }
-
-   public ArmorStandBuilder withHeadPose(EulerAngle headPose) {
-      this.headPose = headPose;
-      return this;
-   }
-
-   public ArmorStandBuilder withBodyPose(EulerAngle bodyPose) {
-      this.bodyPose = bodyPose;
-      return this;
-   }
-
-   public ArmorStandBuilder withLeftArmPose(EulerAngle leftArmPose) {
-      this.leftArmPose = leftArmPose;
-      return this;
-   }
-
-   public ArmorStandBuilder withRightArmPose(EulerAngle rightArmPose) {
-      this.rightArmPose = rightArmPose;
-      return this;
-   }
-
-   public ArmorStandBuilder withLeftLegPose(EulerAngle leftArmPose) {
-      this.leftArmPose = leftArmPose;
-      return this;
-   }
-
-   public ArmorStandBuilder withRightLegPose(EulerAngle rightLegPose) {
-      this.rightLegPose = rightLegPose;
-      return this;
-   }
-
-   public ArmorStandBuilder withNoBase() {
-      this.base = false;
-      return this;
-   }
-
    public ArmorStandBuilder holding(ItemStack holding) {
       this.holding = holding;
       return this;
    }
-
    public ArmorStandBuilder withSmall() {
       this.small = true;
       return this;
    }
-
    public ArmorStand spawn() {
-      ArmorStand stand = (ArmorStand)this.location.getWorld().spawnEntity(new Location(this.location.getWorld(), this.location.getX(), this.location.getY(), this.location.getZ()), EntityType.ARMOR_STAND);
+      ArmorStand stand = (ArmorStand) Objects.requireNonNull(this.location.getWorld()).spawnEntity(new Location(this.location.getWorld(), this.location.getX(), this.location.getY(), this.location.getZ()), EntityType.ARMOR_STAND);
       stand.setGravity(this.gravity);
       stand.setVisible(this.visible);
-      this.plugin.getMobUtils().setTags(stand, new String[]{"Silent"});
+      this.plugin.getMobUtils().setTags(stand, "Silent");
       stand.setCustomName("ba-stand");
       stand.setCustomNameVisible(false);
-      stand.getEquipment().setHelmet(this.helmet);
+      Objects.requireNonNull(stand.getEquipment()).setHelmet(this.helmet);
       stand.getEquipment().setChestplate(this.chestplate);
       stand.getEquipment().setLeggings(this.leggings);
       stand.getEquipment().setBoots(this.boots);

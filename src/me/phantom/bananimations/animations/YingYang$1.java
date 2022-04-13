@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -55,9 +56,7 @@ class YinYang$1 extends BukkitRunnable {
          YinYang.finish(this.animation, this.sender, this.target, this.type, this.reason);
     	  }
          if(this.taskHelper.getCounter() == 160) {
-         this.items.forEach((itemx) -> {
-            itemx.remove();
-         });
+         this.items.forEach(Entity::remove);
          ArmorStand[] var1 = this.stands;
          int var2 = var1.length;
 
@@ -72,7 +71,7 @@ class YinYang$1 extends BukkitRunnable {
 
          for(int var10 = 0; var10 < var3; ++var10) {
             ArmorStand stand = var8[var10];
-            Location nextPoint = Utils.getLocationAroundCircle(this.targetLocation, (double)YinYang.getRadius(this.animation), (double)(this.radPerSec / 20.0F * (float)this.taskHelper.getCounter() + (float)count));
+            Location nextPoint = Utils.getLocationAroundCircle(this.targetLocation, YinYang.getRadius(this.animation), this.radPerSec / 20.0F * (float)this.taskHelper.getCounter() + (float)count);
             if (count == 0) {
                stand.teleport(new Location(this.world, nextPoint.getX(), nextPoint.getY() + this.yDif, nextPoint.getZ()));
             } else {
@@ -107,7 +106,7 @@ class YinYang$1 extends BukkitRunnable {
          item.setVelocity(new Vector(this.animation.getRandom().nextDouble() * 0.2D - 0.1D, 0.8D, this.animation.getRandom().nextDouble() * 0.2D - 0.1D));
          this.items.add(item);
          if (this.items.size() % 40 == 0) {
-            ((Item)this.items.get(0)).remove();
+            this.items.get(0).remove();
             this.items.remove(0);
          }
          this.taskHelper.increment();

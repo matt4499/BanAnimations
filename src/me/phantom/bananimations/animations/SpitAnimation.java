@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Llama;
 import org.bukkit.entity.Player;
@@ -20,20 +21,18 @@ public class SpitAnimation extends Animation {
 
    public void playAnimation(CommandSender sender, Player target, AnimationType type, String reason) {
       super.freeze(target);
-      ArrayList<Llama> llamas = new ArrayList<Llama>();
+      ArrayList<Llama> llamas = new ArrayList<>();
       Location targetLocation = target.getLocation();
-      Location[] var7 = this.getLocationsCross(targetLocation);
-      int var8 = var7.length;
+      Location[] locationsCross = this.getLocationsCross(targetLocation);
 
-      for (int var9 = 0; var9 < var8; ++var9) {
-         Location location = var7[var9];
+      for (Location location : locationsCross) {
          Llama llama = (Llama) target.getWorld().spawnEntity(location, EntityType.LLAMA);
          llama.setAdult();
          llama.setAI(false);
          llama.setGravity(false);
          llama.setInvulnerable(true);
          llama.teleport(
-               llama.getLocation().setDirection(targetLocation.clone().subtract(llama.getLocation()).toVector()));
+                 llama.getLocation().setDirection(targetLocation.clone().subtract(llama.getLocation()).toVector()));
          llamas.add(llama);
       }
 
@@ -49,6 +48,7 @@ public class SpitAnimation extends Animation {
             }
 
             location.add(((Llama) llamas.get(i)).getEyeLocation());
+            assert world != null;
             world.spawnEntity(location, EntityType.LLAMA_SPIT);
          }
 
@@ -56,9 +56,7 @@ public class SpitAnimation extends Animation {
          super.finish(sender, target, type, reason);
       }, 2L, TimeUnit.SECONDS);
       Task.runTaskLater(() -> {
-         llamas.forEach((llama) -> {
-            llama.remove();
-         });
+         llamas.forEach(Entity::remove);
       }, 3L, TimeUnit.SECONDS);
    }
 
@@ -67,8 +65,7 @@ public class SpitAnimation extends Animation {
       double x = center.getX();
       double y = center.getY();
       double z = center.getZ();
-      Location[] cross = new Location[] { new Location(world, x - 1.5D, y, z), new Location(world, x, y, z + 1.5D),
+      return new Location[] { new Location(world, x - 1.5D, y, z), new Location(world, x, y, z + 1.5D),
             new Location(world, x, y, z - 1.5D), new Location(world, x + 1.5D, y, z) };
-      return cross;
    }
 }
