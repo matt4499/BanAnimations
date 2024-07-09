@@ -6,8 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import javax.annotation.Nonnull;
-
 @SuppressWarnings("ALL")
 public class AnimationStartEvent extends Event {
    private static final HandlerList handlers = new HandlerList();
@@ -39,7 +37,7 @@ public class AnimationStartEvent extends Event {
       return this.reason;
    }
 
-   public @Nonnull HandlerList getHandlers() {
+   public HandlerList getHandlers() {
       return handlers;
    }
 

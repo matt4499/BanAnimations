@@ -11,7 +11,7 @@ public enum AnimationType {
 
    private final String command;
 
-   private AnimationType(String command) {
+   AnimationType(String command) {
       this.command = command;
    }
 

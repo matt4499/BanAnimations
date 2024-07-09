@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class LightningAnimation extends Animation {
-   private ItemStack itemBeef;
+   private final ItemStack itemBeef;
 
    public LightningAnimation() {
       super("lightning");

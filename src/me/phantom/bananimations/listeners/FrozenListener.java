@@ -20,7 +20,8 @@ public class FrozenListener implements Listener {
       if (this.plugin.isFrozen(event.getPlayer())) {
          Location to = event.getTo();
          Location from = event.getFrom();
-         if (to.getX() != from.getX() || to.getY() != from.getY() || to.getZ() != from.getZ()) {
+          assert to != null;
+          if (to.getX() != from.getX() || to.getY() != from.getY() || to.getZ() != from.getZ()) {
             event.getPlayer().teleport(from.setDirection(to.getDirection()));
          }
       }

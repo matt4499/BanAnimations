@@ -11,8 +11,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nonnull;
-
 public class BanAnimationsCommand implements CommandExecutor {
    private final BanAnimations plugin;
 
@@ -20,7 +18,7 @@ public class BanAnimationsCommand implements CommandExecutor {
       this.plugin = plugin;
    }
 
-   public boolean onCommand(@Nonnull CommandSender sender, @Nonnull Command command, String label, @Nonnull String[] args) {
+   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
       if (label.equalsIgnoreCase("ba") || label.equalsIgnoreCase("bananimations")) {
          if (!sender.hasPermission("bananimations.ban") || !sender.hasPermission("bananimations.kick") || !sender.hasPermission("bananimations.mute")) {
             Messages.NO_PERMS.send(sender);
