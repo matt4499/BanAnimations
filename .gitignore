@@ -8,8 +8,9 @@
 *.tar.gz
 *.rar
 build
-.idea
-gradle
+/gradle/
 .gradle
 gradlew
 gradlew.bat
+/.idea/modules/
+/.idea/
