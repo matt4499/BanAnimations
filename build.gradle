@@ -22,6 +22,9 @@ sourceSets {
         java {
             srcDirs = ['src']
         }
+        resources {
+            srcDirs = ['src/resources']
+        }
     }
 }
 dependencies {
@@ -32,4 +35,11 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.processResources {
+    from("src/resources") {
+        include "plugin.yml"
+    }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
