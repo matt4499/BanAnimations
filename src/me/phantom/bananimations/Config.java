@@ -36,6 +36,7 @@ public class Config {
       configuration.addDefault("Messages.player_animation_bypass_enabled", "&cYou can not play an animation on {0}!");
       configuration.addDefault("Messages.player_already_in_animation", "&c&l{0} is already in an animation!");
       configuration.addDefault("Messages.invalid_animation_name", "&cThere is no animation called &c&l{0}&c!");
+      configuration.addDefault("RandomAnimationPool", new ArrayList<String>());
       configuration.options().copyDefaults(true);
       this.plugin.saveConfig();
       this.plugin.reloadConfig();

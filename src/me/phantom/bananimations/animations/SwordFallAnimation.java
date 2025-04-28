@@ -67,7 +67,7 @@ public class SwordFallAnimation extends Animation {
             stands.remove(0);
             if (taskHelper.getCounter() % 4 == 0) {
                assert world != null;
-               world.playEffect(new Location(world, x + this.getRandom().nextDouble() - 0.5D, y, z + this.getRandom().nextDouble() - 0.5D), Effect.STEP_SOUND, 152);
+               world.playEffect(new Location(world, x + this.getRandom().nextDouble() - 0.5D, y, z + this.getRandom().nextDouble() - 0.5D), Effect.ANVIL_LAND, 152);
             }
          }
 

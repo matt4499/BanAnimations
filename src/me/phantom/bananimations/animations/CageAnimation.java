@@ -4,6 +4,6 @@ import org.bukkit.Material;
 
 public class CageAnimation extends Box {
 	public CageAnimation() {
-		super("cage", Material.BEEF);
+		super("cage", Material.ANVIL);
 	}
 }

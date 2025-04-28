@@ -2,18 +2,9 @@ package me.phantom.bananimations;
 
 import java.util.*;
 import java.util.logging.Logger;
-import me.phantom.bananimations.animations.CageAnimation;
-import me.phantom.bananimations.animations.CarFallAnimation;
-import me.phantom.bananimations.animations.ExplodeAnimation;
-import me.phantom.bananimations.animations.FreezeAnimation;
-import me.phantom.bananimations.animations.GwenAnimation;
-import me.phantom.bananimations.animations.LightningAnimation;
-import me.phantom.bananimations.animations.MeteorAnimation;
-import me.phantom.bananimations.animations.PigAnimation;
-import me.phantom.bananimations.animations.SnapTrapAnimation;
-import me.phantom.bananimations.animations.SpitAnimation;
-import me.phantom.bananimations.animations.SwordFallAnimation;
-import me.phantom.bananimations.animations.YinYang;
+import java.util.stream.Collectors;
+
+import me.phantom.bananimations.animations.*;
 import me.phantom.bananimations.api.Animation;
 import me.phantom.bananimations.commands.BATabCompletion;
 import me.phantom.bananimations.commands.BanAnimationsCommand;
@@ -34,26 +25,46 @@ public class BanAnimations extends JavaPlugin {
    private Random random;
    private MobUtils mobUtils;
    private final Config config = new Config(this);
-
    public Logger logger;
 
+
+   /** Stores the lowercase names of animations allowed in the 'random' selection pool, loaded from config. */
+   private List<String> randomAnimationPool = new ArrayList<>();
+
+
+
+   @Override
    public void onEnable() {
       PluginDescriptionFile pdfFile = this.getDescription();
       logger = this.getLogger();
+
       this.config.loadDefaultConfig();
       Messages.setFile(this.getConfig());
+
       this.mobUtils = new MobUtils(this);
       this.random = new Random();
       new Task(this);
+
       this.animationHooks();
+
+
+      this.loadRandomAnimationPool();
+
+
       this.registerCommands();
       this.registerEvents();
+
       logger.info(String.format("BanAnimations (%s) has been enabled!", pdfFile.getVersion()));
    }
 
+   @Override
    public void onDisable() {
+      animations.clear();
+      frozenPlayers.clear();
+      randomAnimationPool.clear();
       logger.info("BanAnimations has been disabled!");
    }
+
 
    public void registerCommands() {
       Objects.requireNonNull(getCommand("bananimations")).setExecutor(new BanAnimationsCommand(this));
@@ -87,40 +98,114 @@ public class BanAnimations extends JavaPlugin {
    }
 
    public void freeze(Player player) {
-      this.frozenPlayers.add(player);
-   }
-
-   public void unFreeze(Player player) {
-      this.frozenPlayers.remove(player);
-   }
-
-   public void registerAnimation(Animation animation, String name) {
-      animations.put(name, animation);
-      logger.info("Animation " + name + " has been loaded!");
-   }
-
-   public boolean isValidAnimation(String animation) {
-      if (animation == null) {
-         return true;
-      } else {
-         return !animation.equals("random") && !animations.containsKey(animation);
+      if (player != null && !this.frozenPlayers.contains(player)) {
+         this.frozenPlayers.add(player);
       }
    }
 
+   public void unFreeze(Player player) {
+      if (player != null) {
+         this.frozenPlayers.remove(player);
+      }
+   }
+
+   public void registerAnimation(Animation animation, String name) {
+      String lowerCaseName = name.toLowerCase();
+      if (animations.containsKey(lowerCaseName)) {
+         logger.warning("Attempted to register animation with duplicate name: '" + lowerCaseName + "'. Overwriting.");
+      }
+      animations.put(lowerCaseName, animation);
+      logger.info("Animation " + lowerCaseName + " has been loaded!");
+   }
+
+   public boolean isValidAnimation(String animationName) {
+      if (animationName == null) {
+         return false;
+      }
+      String lowerCaseName = animationName.toLowerCase();
+      return !lowerCaseName.equals("random") && animations.containsKey(lowerCaseName);
+   }
+
+
    public Animation getAnimation(String animationName) {
-      return animations.get(animationName);
+      if (animationName == null) return null;
+      return animations.get(animationName.toLowerCase());
    }
 
    public Set<String> getAnimationNames() {
       return animations.keySet();
    }
 
+
+   /**
+    * Gets a random animation, respecting the RandomAnimationPool from config.yml.
+    * If the pool is empty or contains only invalid animations, it falls back to
+    * selecting from ALL available animations.
+    *
+    * @return A random Animation instance, or null if no animations are available at all.
+    */
    public Animation getRandomAnimation() {
-      Object[] values = animations.values().toArray();
-      return (Animation) values[this.random.nextInt(values.length)];
+
+      if (!this.randomAnimationPool.isEmpty()) {
+
+         List<Animation> allowedAnimations = this.randomAnimationPool.stream()
+                 .map(animations::get)
+                 .filter(Objects::nonNull)
+                 .collect(Collectors.toList());
+
+
+         if (!allowedAnimations.isEmpty()) {
+            return allowedAnimations.get(this.random.nextInt(allowedAnimations.size()));
+         } else {
+
+            logger.warning("All animations listed in RandomAnimationPool were invalid. Falling back to selecting from ALL animations.");
+         }
+      }
+
+      Object[] allValues = animations.values().toArray();
+      if (allValues.length == 0) {
+         logger.severe("No animations available to select for 'random'!");
+         return null;
+      }
+      return (Animation) allValues[this.random.nextInt(allValues.length)];
    }
+
+   /**
+    * Loads the list of allowed animation names for the 'random' pool from config.yml.
+    * It validates that the listed animations actually exist in the loaded 'animations' map.
+    */
+   private void loadRandomAnimationPool() {
+      this.randomAnimationPool.clear();
+      List<String> configuredPool = getConfig().getStringList("RandomAnimationPool");
+
+
+      if (configuredPool == null || configuredPool.isEmpty()) {
+         logger.info("RandomAnimationPool is not defined or is empty in config.yml. 'Random' will select from all animations.");
+         return;
+      }
+
+      int loadedCount = 0;
+      for (String name : configuredPool) {
+         if (name == null || name.trim().isEmpty()) continue;
+
+         String lowerName = name.toLowerCase().trim(); // Standardize to lowercase
+
+         // Check if this animation name is actually registered
+         if (animations.containsKey(lowerName)) {
+            this.randomAnimationPool.add(lowerName); // Add valid name to the internal pool
+            loadedCount++;
+         } else {
+            // Log a warning for animation names listed but not found
+            logger.warning("Animation '" + name + "' listed in RandomAnimationPool does not exist and will be ignored.");
+         }
+      }
+      logger.info("Loaded " + loadedCount + " valid animations into the RandomAnimationPool.");
+   }
+
 
    public MobUtils getMobUtils() {
       return this.mobUtils;
    }
+
+
 }
