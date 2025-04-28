@@ -1,7 +1,7 @@
 main: me.phantom.bananimations.BanAnimations
 name: BanAnimations
 version: 1.0
-authors: ["Phantom_", "Matt4499"]
+authors: ["Phantom_", "Matt4499", "Corøna"]
 description: Ban hackers and rulebreakers with fashion! Updated for 1.21!
 api-version: 1.21
 commands:
