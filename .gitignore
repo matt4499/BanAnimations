@@ -20,6 +20,7 @@ gradle-app.setting
 .gradletasknamecache
 .project
 .classpath
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
