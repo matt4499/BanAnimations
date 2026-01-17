@@ -2,6 +2,7 @@ package me.phantom.bananimations.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -9,20 +10,42 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+/**
+ * Utility class containing general helper methods.
+ */
 public class Utils {
+
+    /**
+     * Translates alternate color codes in a string.
+     * @param txt The string to colorize.
+     * @return The colorized string.
+     */
    public static String color(String txt) {
       return ChatColor.translateAlternateColorCodes('&', txt);
    }
 
+    /**
+     * Sets a lore line on an item stack with a "ba-" prefix.
+     * @param item The item stack to modify.
+     * @param s The lore string suffix.
+     */
    public static void setLore(ItemStack item, String s) {
       ItemMeta meta = item.getItemMeta();
-      List<String> lore = new ArrayList<String>();
+      List<String> lore = new ArrayList<>();
       lore.add("ba-" + s);
-      assert meta != null;
-      meta.setLore(lore);
-      item.setItemMeta(meta);
+      if (meta != null) {
+          meta.setLore(lore);
+          item.setItemMeta(meta);
+      }
    }
 
+    /**
+     * Calculates a location around a circle.
+     * @param center The center location.
+     * @param radius The radius from the center.
+     * @param angleInRadian The angle in radians.
+     * @return The calculated location facing the center.
+     */
    public static Location getLocationAroundCircle(Location center, double radius, double angleInRadian) {
       double x = center.getX() + radius * Math.cos(angleInRadian);
       double z = center.getZ() + radius * Math.sin(angleInRadian);
@@ -33,10 +56,17 @@ public class Utils {
       return loc;
    }
 
+    /**
+     * Generates a list of locations forming a circle.
+     * @param center The center location.
+     * @param radius The radius of the circle.
+     * @param amount The number of points to generate.
+     * @return A list of locations.
+     */
    public static ArrayList<Location> getCircle(Location center, double radius, int amount) {
       World world = center.getWorld();
-      double increment = 6.283185307179586D / (double)amount;
-      ArrayList<Location> locations = new ArrayList<Location>();
+      double increment = (2 * Math.PI) / (double)amount;
+      ArrayList<Location> locations = new ArrayList<>();
 
       for(int i = 0; i < amount; ++i) {
          double angle = (double)i * increment;

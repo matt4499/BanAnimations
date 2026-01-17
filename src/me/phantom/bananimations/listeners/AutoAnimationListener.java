@@ -1,8 +1,9 @@
 package me.phantom.bananimations.listeners;
 
-import me.phantom.bananimations.AnimationType;
-import me.phantom.bananimations.BanAnimations;
-import me.phantom.bananimations.Messages;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Objects;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -11,121 +12,106 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-import java.util.HashMap;
-import java.util.Objects;
+import me.phantom.bananimations.AnimationType;
+import me.phantom.bananimations.BanAnimations;
+import me.phantom.bananimations.Messages;
 
+/**
+ * Listener that intercepts standard punishment commands to play an animation instead.
+ */
 public class AutoAnimationListener implements Listener {
-   private final BanAnimations plugin;
-   private final HashMap<AnimationType, String> commandsWithAnimations = new HashMap<>();
+    private final BanAnimations plugin;
+    private final HashMap<AnimationType, String> commandsWithAnimations = new HashMap<>();
 
-   public AutoAnimationListener(BanAnimations plugin) {
-      this.plugin = plugin;
-      this.loadConfig();
-   }
+    public AutoAnimationListener(BanAnimations plugin) {
+        this.plugin = plugin;
+        this.loadConfig();
+    }
 
-   @EventHandler(
-      ignoreCancelled = true
-   )
-   public void onCommand(PlayerCommandPreprocessEvent event) {
-      String cmd = event.getMessage().toLowerCase();
-      Player sender = event.getPlayer();
-      AnimationType type;
-      if (cmd.startsWith("/ban ")) {
-         if (!sender.hasPermission("bananimations.ban")) {
-            return;
-         }
+    @EventHandler(ignoreCancelled = true)
+    public void onCommand(PlayerCommandPreprocessEvent event) {
+        String msg = event.getMessage();
+        String[] args = msg.split(" ");
+        if (args.length < 1) return;
+        
+        String command = args[0].toLowerCase();
+        // Remove slash
+        if (command.startsWith("/")) command = command.substring(1);
+        
+        Player sender = event.getPlayer();
+        AnimationType type = null;
+        String perm = null;
 
-         type = AnimationType.BAN;
-      } else if (cmd.startsWith("/ipban ")) {
-         if (!sender.hasPermission("bananimations.ipban")) {
-            return;
-         }
+        switch (command) {
+            case "ban": type = AnimationType.BAN; perm = "bananimations.ban"; break;
+            case "ipban": type = AnimationType.IP_BAN; perm = "bananimations.ipban"; break;
+            case "tempban": type = AnimationType.TEMP_BAN; perm = "bananimations.tempban"; break;
+            case "kick": type = AnimationType.KICK; perm = "bananimations.kick"; break;
+            case "mute": type = AnimationType.MUTE; perm = "bananimations.mute"; break;
+            case "tempmute": type = AnimationType.TEMP_MUTE; perm = "bananimations.tempmute"; break;
+        }
 
-         type = AnimationType.IP_BAN;
-      } else if (cmd.startsWith("/tempban ")) {
-         if (!sender.hasPermission("bananimations.tempban")) {
-            return;
-         }
+        if (type == null) return;
+        if (!sender.hasPermission(perm)) return;
 
-         type = AnimationType.TEMP_BAN;
-      } else if (cmd.startsWith("/kick ")) {
-         if (!sender.hasPermission("bananimations.kick")) {
-            return;
-         }
+        if (this.commandsWithAnimations.containsKey(type)) {
+            String animationName = this.commandsWithAnimations.get(type);
+            
+            // Fix: Check if animation is valid OR random. If neither, it's invalid.
+            boolean isRandom = animationName.equalsIgnoreCase("random");
+            if (!this.plugin.isValidAnimation(animationName) && !isRandom) {
+                Bukkit.getLogger().severe("[Ban Animations] Invalid animation in config: " + animationName + "!");
+                Bukkit.getLogger().severe("[Ban Animations] Player is being punished without an animation!");
+                return;
+            }
 
-         type = AnimationType.KICK;
-      } else if (cmd.startsWith("/mute ")) {
-         if (!sender.hasPermission("bananimations.mute")) {
-            return;
-         }
-
-         type = AnimationType.MUTE;
-      } else {
-         if (!cmd.startsWith("/tempmute ")) {
-            return;
-         }
-
-         if (!sender.hasPermission("bananimations.tempmute")) {
-            return;
-         }
-
-         type = AnimationType.TEMP_MUTE;
-      }
-
-      if (this.commandsWithAnimations.containsKey(type)) {
-         String animationName = this.commandsWithAnimations.get(type);
-         if (this.plugin.isValidAnimation(animationName)) {
-            Bukkit.getLogger().severe("[Ban Animations] Invalid animation is config! Animation " + animationName + "!");
-            Bukkit.getLogger().severe("[Ban Animations] Player is being punished without an animation!");
-         } else {
-            String[] args = cmd.split(" ");
             if (args.length >= 2) {
-               if (Bukkit.getPlayer(args[1]) != null) {
-                  Player target = Bukkit.getPlayer(args[1]);
-                  if(target == null) {
-                     Bukkit.getLogger().severe("[Ban Animations] Player is not online!");
-                     return;
-                  }
-                  if (!target.hasPermission("bananimations.bypass")) {
-                     StringBuilder reason = new StringBuilder();
+                Player target = Bukkit.getPlayer(args[1]);
+                if (target == null) {
+                    return;
+                }
 
-                     for(int i = 2; i < args.length; ++i) {
-                        reason.append(args[i]).append(" ");
-                     }
+                if (!target.hasPermission("bananimations.bypass")) {
+                    String reason = "";
+                    if (args.length > 2) {
+                        reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
+                    }
 
-                     event.setCancelled(true);
-                     Messages.ANIMATION_START_MESSAGE.send(event.getPlayer(), animationName, target.getName());
-                     this.activateAnimation(event.getPlayer(), target, animationName, type, reason.toString());
-                  }
-               }
+                    event.setCancelled(true);
+                    Messages.ANIMATION_START_MESSAGE.send(event.getPlayer(), animationName, target.getName());
+                    this.activateAnimation(event.getPlayer(), target, animationName, type, reason);
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   private void activateAnimation(CommandSender sender, Player target, String animationName, AnimationType type, String reason) {
-      if (animationName.equalsIgnoreCase("random")) {
-         this.plugin.getRandomAnimation().callAnimation(sender, target, type, reason);
-      } else {
-         this.plugin.getAnimation(animationName).callAnimation(sender, target, type, reason);
-      }
-
-   }
-
-   private void loadConfig() {
-      ConfigurationSection configSection = this.plugin.getConfig().getConfigurationSection("play_animation_on");
-
-      assert configSection != null;
-      for (String key : configSection.getKeys(false)) {
-         try {
-            if (configSection.getBoolean(key + ".enabled")) {
-               String animationName = Objects.requireNonNull(configSection.getString(key + ".animation")).toLowerCase();
-               this.commandsWithAnimations.put(AnimationType.valueOf(key), animationName);
+    private void activateAnimation(CommandSender sender, Player target, String animationName, AnimationType type, String reason) {
+        if (animationName.equalsIgnoreCase("random")) {
+            me.phantom.bananimations.api.Animation animation = this.plugin.getRandomAnimation();
+            if (animation != null) {
+                animation.callAnimation(sender, target, type, reason);
             }
-         } catch (Exception var5) {
-            var5.printStackTrace();
-         }
-      }
+        } else {
+             me.phantom.bananimations.api.Animation animation = this.plugin.getAnimation(animationName);
+             if (animation != null) {
+                 animation.callAnimation(sender, target, type, reason);
+             }
+        }
+    }
 
-   }
+    private void loadConfig() {
+        ConfigurationSection configSection = this.plugin.getConfig().getConfigurationSection("play_animation_on");
+        if (configSection != null) {
+            for (String key : configSection.getKeys(false)) {
+                try {
+                    if (configSection.getBoolean(key + ".enabled")) {
+                        String animationName = Objects.requireNonNull(configSection.getString(key + ".animation")).toLowerCase();
+                        this.commandsWithAnimations.put(AnimationType.valueOf(key), animationName);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

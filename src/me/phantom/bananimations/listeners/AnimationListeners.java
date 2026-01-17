@@ -7,26 +7,33 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
+/**
+ * Listeners for general entities involved in animations.
+ */
 public class AnimationListeners implements Listener {
-   @EventHandler
-   public void onFallingBlockland(EntityChangeBlockEvent event) {
-      if (event.getEntity().getCustomName() != null && event.getEntity().getCustomName().equalsIgnoreCase("banAnimations")) {
-         event.getEntity().remove();
-         event.setCancelled(true);
-      }
-   }
-   @EventHandler
-   public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
-      if (event.getRightClicked() instanceof ArmorStand) {
-         if (event.getRightClicked().getName().equals("ba-stand")) {
+
+    @EventHandler
+    public void onFallingBlockLand(EntityChangeBlockEvent event) {
+        if (event.getEntity().getCustomName() != null && event.getEntity().getCustomName().equalsIgnoreCase("banAnimations")) {
+            event.getEntity().remove();
             event.setCancelled(true);
-         }
-      }
-   }
-   @EventHandler
-   public void onEntityDamageEntityEvent(EntityDamageByEntityEvent event) {
-      if (event.getDamager().getCustomName() != null && (event.getDamager().getCustomName().equals("ba-fangs") || event.getDamager().getCustomName().equalsIgnoreCase("bananimations-guardian"))) {
-         event.setCancelled(true);
-      }
-   }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
+        if (event.getRightClicked() instanceof ArmorStand) {
+            if ("ba-stand".equals(event.getRightClicked().getCustomName())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageEntityEvent(EntityDamageByEntityEvent event) {
+        String customName = event.getDamager().getCustomName();
+        if (customName != null && (customName.equals("ba-fangs") || customName.equalsIgnoreCase("bananimations-guardian"))) {
+            event.setCancelled(true);
+        }
+    }
 }

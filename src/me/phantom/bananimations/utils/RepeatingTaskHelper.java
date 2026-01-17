@@ -2,23 +2,32 @@ package me.phantom.bananimations.utils;
 
 import org.bukkit.Bukkit;
 
+/**
+ * Helper class to manage state within repeating tasks, specifically counting and cancellation.
+ */
 public class RepeatingTaskHelper {
-   private int taskID;
-   private int counter;
+    private int taskID;
+    private int counter;
 
-   public void increment() {
-      ++this.counter;
-   }
+    /**
+     * Increments the internal counter.
+     */
+    public void increment() {
+        ++this.counter;
+    }
 
-   public int getCounter() {
-      return this.counter;
-   }
+    public int getCounter() {
+        return this.counter;
+    }
 
-   public void setTaskID(int taskID) {
-      this.taskID = taskID;
-   }
+    public void setTaskID(int taskID) {
+        this.taskID = taskID;
+    }
 
-   public void cancel() {
-      Bukkit.getScheduler().cancelTask(this.taskID);
-   }
+    /**
+     * Cancels the associated task.
+     */
+    public void cancel() {
+        Bukkit.getScheduler().cancelTask(this.taskID);
+    }
 }
