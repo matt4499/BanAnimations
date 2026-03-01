@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
@@ -69,8 +70,59 @@ public abstract class Animation {
     public boolean finish(CommandSender sender, Player target, AnimationType type, String reason) {
         if (type != AnimationType.TEST) {
             try {
-                Bukkit.dispatchCommand(sender, type + " " + target.getName() + " " + reason);
-                target.playSound(target.getEyeLocation(), Sounds.ENTITY_WITHER_AMBIENT.get(), 0.1F, 2.0F);
+                BanAnimations.PendingPunishment pending = this.plugin.takePendingPunishment(target);
+                String finalReason = reason == null ? "" : reason;
+                String finalDuration = "permanent";
+                String finalAnimation = this.getName();
+                AnimationType finalType = type;
+
+                if (pending != null) {
+                    finalType = pending.getType() != null ? pending.getType() : type;
+                    if (pending.getReason() != null) {
+                        finalReason = pending.getReason();
+                    }
+                    if (pending.getDuration() != null && !pending.getDuration().isEmpty()) {
+                        finalDuration = pending.getDuration();
+                    }
+                    if (pending.getAnimationName() != null && !pending.getAnimationName().isEmpty()) {
+                        finalAnimation = pending.getAnimationName();
+                    }
+                } else if (type == AnimationType.TEMP_BAN || type == AnimationType.TEMP_MUTE) {
+                    String[] split = finalReason.split(" ", 2);
+                    if (split.length >= 1 && !split[0].trim().isEmpty()) {
+                        finalDuration = split[0].trim();
+                    }
+                    finalReason = split.length > 1 ? split[1].trim() : "";
+                }
+
+                String commandTemplate = this.resolveCommandTemplate(finalType);
+                if (!commandTemplate.isEmpty()) {
+                    String senderName = sender != null ? sender.getName() : "";
+                    String commandText = commandTemplate
+                            .replace("%player%", target.getName())
+                            .replace("%reason%", finalReason)
+                            .replace("%time%", finalDuration)
+                            .replace("%duration%", finalDuration)
+                            .replace("%animation%", finalAnimation)
+                            .replace("%type%", finalType.toString())
+                            .replace("%sender%", senderName)
+                            .trim();
+
+                    commandText = commandText.replaceAll("\\s+", " ");
+                    if (commandText.startsWith("/")) {
+                        commandText = commandText.substring(1);
+                    }
+
+                    if (!commandText.isEmpty()) {
+                        if (sender instanceof Player playerSender) {
+                            Bukkit.dispatchCommand(playerSender, commandText);
+                        } else {
+                            this.plugin.getLogger().warning("Skipping punishment command for '" + target.getName() + "' because initiator is not a player. Command: " + commandText);
+                        }
+                    }
+                }
+
+                target.playSound(target.getLocation(), Sounds.ENTITY_WITHER_AMBIENT.get(), 0.1F, 2.0F);
                 this.playSound(target, sender, Sounds.ENTITY_WITHER_AMBIENT.get(), 0.1F, 2.0F);
             } catch (CommandException e) {
                 e.printStackTrace();
@@ -91,9 +143,9 @@ public abstract class Animation {
      * @param pitch  The pitch.
      */
     public void playSound(Player target, CommandSender sender, Sound sound, float volume, float pitch) {
-        target.playSound(target.getEyeLocation(), sound, volume, pitch);
+        target.playSound(target.getLocation(), sound, volume, pitch);
         if (sender instanceof Player player) {
-            player.playSound(player.getEyeLocation(), sound, volume, pitch);
+            player.playSound(player.getLocation(), sound, volume, pitch);
         }
     }
 
@@ -139,6 +191,14 @@ public abstract class Animation {
 
     public String getName() {
         return this.name;
+    }
+
+    private String resolveCommandTemplate(AnimationType type) {
+        FileConfiguration configuration = this.plugin.getConfig();
+        String key = type.toString().toLowerCase();
+        String path = "punishment_commands." + key;
+        String configured = configuration.getString(path, "");
+        return configured == null ? "" : configured;
     }
 
     /**

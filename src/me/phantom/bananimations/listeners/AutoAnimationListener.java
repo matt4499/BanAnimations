@@ -40,19 +40,18 @@ public class AutoAnimationListener implements Listener {
         
         Player sender = event.getPlayer();
         AnimationType type = null;
-        String perm = null;
 
         switch (command) {
-            case "ban": type = AnimationType.BAN; perm = "bananimations.ban"; break;
-            case "ipban": type = AnimationType.IP_BAN; perm = "bananimations.ipban"; break;
-            case "tempban": type = AnimationType.TEMP_BAN; perm = "bananimations.tempban"; break;
-            case "kick": type = AnimationType.KICK; perm = "bananimations.kick"; break;
-            case "mute": type = AnimationType.MUTE; perm = "bananimations.mute"; break;
-            case "tempmute": type = AnimationType.TEMP_MUTE; perm = "bananimations.tempmute"; break;
+            case "ban": type = AnimationType.BAN; break;
+            case "ipban": type = AnimationType.IP_BAN; break;
+            case "tempban": type = AnimationType.TEMP_BAN; break;
+            case "kick": type = AnimationType.KICK; break;
+            case "mute": type = AnimationType.MUTE; break;
+            case "tempmute": type = AnimationType.TEMP_MUTE; break;
         }
 
         if (type == null) return;
-        if (!sender.hasPermission(perm)) return;
+        if (!sender.hasPermission(this.plugin.getPermissionForType(type))) return;
 
         if (this.commandsWithAnimations.containsKey(type)) {
             String animationName = this.commandsWithAnimations.get(type);
@@ -71,7 +70,7 @@ public class AutoAnimationListener implements Listener {
                     return;
                 }
 
-                if (!target.hasPermission("bananimations.bypass")) {
+                if (!target.hasPermission(this.plugin.getPermissionNode("bypass"))) {
                     String reason = "";
                     if (args.length > 2) {
                         reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));

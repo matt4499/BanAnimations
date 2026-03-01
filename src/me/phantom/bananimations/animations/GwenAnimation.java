@@ -26,7 +26,8 @@ public class GwenAnimation extends Animation {
 
     protected static final double GUARDIAN_ROTATION_RADIUS = 3.0;
     protected static final double GUARDIAN_CENTER_Y_OFFSET = 6.0;
-    protected static final double DEGREES_PER_TICK = 5.0;
+    protected static final double BASE_DEGREES_PER_TICK = 3.0;
+    protected static final double MAX_DEGREES_PER_TICK = 14.0;
 
     public GwenAnimation() {
         super("gwen");
@@ -187,6 +188,7 @@ public class GwenAnimation extends Animation {
             // Angles corresponding to the 4 spawn positions defined in getInitialGuardianLocations
             double[] startAngles = {45.0, 135.0, 225.0, 315.0};
             double currentTick = this.taskHelper.getCounter();
+            double rotationSpeed = this.getCurrentDegreesPerTick(currentTick);
 
             for (int i = 0; i < this.guardians.size(); i++) {
                 Guardian guardian = this.guardians.get(i);
@@ -199,7 +201,7 @@ public class GwenAnimation extends Animation {
 
                 // Calculate next position on the circle based on time (tick) to ensure consistent rotation
                 // Use teleport instead of velocity to allow noclip/passing through blocks
-                double angleDeg = startAngles[i % 4] + (currentTick * GwenAnimation.DEGREES_PER_TICK);
+                double angleDeg = startAngles[i % 4] + (currentTick * rotationSpeed);
                 Location nextLoc = Utils.getLocationAroundCircle(
                         this.guardianCenter,
                         GwenAnimation.GUARDIAN_ROTATION_RADIUS,
@@ -209,6 +211,14 @@ public class GwenAnimation extends Animation {
                 guardian.teleport(nextLoc);
                 guardian.setVelocity(new Vector(0, 0, 0));
             }
+        }
+
+        private double getCurrentDegreesPerTick(double currentTick) {
+            double progress = Math.max(0.0D, Math.min(1.0D, currentTick / TOTAL_ANIMATION_TICKS));
+            double easedProgress = Math.pow(progress, 2.2D);
+
+            return GwenAnimation.BASE_DEGREES_PER_TICK
+                    + ((GwenAnimation.MAX_DEGREES_PER_TICK - GwenAnimation.BASE_DEGREES_PER_TICK) * easedProgress);
         }
 
         private void cleanupGuardians() {

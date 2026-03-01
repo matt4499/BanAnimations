@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -13,17 +15,27 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.phantom.bananimations.animations.AllayVerdictAnimation;
+import me.phantom.bananimations.animations.ArmadilloAnimation;
+import me.phantom.bananimations.animations.BoggedBarrageAnimation;
 import me.phantom.bananimations.animations.CageAnimation;
+import me.phantom.bananimations.animations.CamelCourtAnimation;
 import me.phantom.bananimations.animations.CarFallAnimation;
+import me.phantom.bananimations.animations.CreakingCurseAnimation;
+import me.phantom.bananimations.animations.EndermanAnimation;
 import me.phantom.bananimations.animations.ExplodeAnimation;
 import me.phantom.bananimations.animations.FreezeAnimation;
+import me.phantom.bananimations.animations.GoatAnimation;
 import me.phantom.bananimations.animations.GwenAnimation;
 import me.phantom.bananimations.animations.LightningAnimation;
 import me.phantom.bananimations.animations.MeteorAnimation;
+import me.phantom.bananimations.animations.PhantomAnimation;
 import me.phantom.bananimations.animations.PigAnimation;
 import me.phantom.bananimations.animations.SnapTrapAnimation;
+import me.phantom.bananimations.animations.SnifferTribunalAnimation;
 import me.phantom.bananimations.animations.SpitAnimation;
 import me.phantom.bananimations.animations.SwordFallAnimation;
+import me.phantom.bananimations.animations.WitchTrialAnimation;
 import me.phantom.bananimations.animations.YinYang;
 import me.phantom.bananimations.api.Animation;
 import me.phantom.bananimations.commands.BATabCompletion;
@@ -31,6 +43,7 @@ import me.phantom.bananimations.commands.BanAnimationsCommand;
 import me.phantom.bananimations.listeners.AnimationListeners;
 import me.phantom.bananimations.listeners.AutoAnimationListener;
 import me.phantom.bananimations.listeners.FrozenListener;
+import me.phantom.bananimations.listeners.PunishGuiListener;
 import me.phantom.bananimations.utils.Task;
 import me.phantom.bananimations.utils.mobutils.MobUtils;
 
@@ -43,6 +56,8 @@ public class BanAnimations extends JavaPlugin {
     private Random random;
     private MobUtils mobUtils;
     private final Config config = new Config(this);
+    private PunishGuiListener punishGuiListener;
+    private final ConcurrentHashMap<UUID, PendingPunishment> pendingPunishments = new ConcurrentHashMap<>();
     public Logger logger;
     public static JavaPlugin instance;
 
@@ -53,6 +68,11 @@ public class BanAnimations extends JavaPlugin {
         logger = this.getLogger();
 
         this.config.loadDefaultConfig();
+        if (!this.config.validateConfig()) {
+            logger.severe("BanAnimations configuration validation failed. Disabling plugin.");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
         Messages.setFile(this.getConfig());
 
         this.mobUtils = new MobUtils(this);
@@ -89,6 +109,8 @@ public class BanAnimations extends JavaPlugin {
         pm.registerEvents(new FrozenListener(this), this);
         pm.registerEvents(new AnimationListeners(), this);
         pm.registerEvents(new AutoAnimationListener(this), this);
+        this.punishGuiListener = new PunishGuiListener(this);
+        pm.registerEvents(this.punishGuiListener, this);
     }
 
     /**
@@ -107,6 +129,16 @@ public class BanAnimations extends JavaPlugin {
         (new SwordFallAnimation()).hook();
         (new SnapTrapAnimation()).hook();
         (new YinYang()).hook();
+        (new AllayVerdictAnimation()).hook();
+        (new BoggedBarrageAnimation()).hook();
+        (new SnifferTribunalAnimation()).hook();
+        (new ArmadilloAnimation()).hook();
+        (new CamelCourtAnimation()).hook();
+        (new CreakingCurseAnimation()).hook();
+        (new GoatAnimation()).hook();
+        (new PhantomAnimation()).hook();
+        (new WitchTrialAnimation()).hook();
+        (new EndermanAnimation()).hook();
     }
 
     public boolean isFrozen(Player player) {
@@ -172,5 +204,82 @@ public class BanAnimations extends JavaPlugin {
 
     public MobUtils getMobUtils() {
         return this.mobUtils;
+    }
+
+    public PunishGuiListener getPunishGuiListener() {
+        return this.punishGuiListener;
+    }
+
+    public String getPermissionNode(String key) {
+        return this.getConfig().getString("permissions." + key, "");
+    }
+
+    public String getPermissionForType(AnimationType type) {
+        if (type == null) {
+            return "";
+        }
+
+        switch (type) {
+            case BAN:
+                return this.getPermissionNode("ban");
+            case KICK:
+                return this.getPermissionNode("kick");
+            case MUTE:
+                return this.getPermissionNode("mute");
+            case TEMP_BAN:
+                return this.getPermissionNode("tempban");
+            case IP_BAN:
+                return this.getPermissionNode("ipban");
+            case TEMP_MUTE:
+                return this.getPermissionNode("tempmute");
+            case TEST:
+                return this.getPermissionNode("test");
+            default:
+                return "";
+        }
+    }
+
+    public void setPendingPunishment(Player target, AnimationType type, String duration, String reason, String animationName) {
+        if (target == null || type == null) {
+            return;
+        }
+        this.pendingPunishments.put(target.getUniqueId(), new PendingPunishment(type, duration, reason, animationName));
+    }
+
+    public PendingPunishment takePendingPunishment(Player target) {
+        if (target == null) {
+            return null;
+        }
+        return this.pendingPunishments.remove(target.getUniqueId());
+    }
+
+    public static class PendingPunishment {
+        private final AnimationType type;
+        private final String duration;
+        private final String reason;
+        private final String animationName;
+
+        public PendingPunishment(AnimationType type, String duration, String reason, String animationName) {
+            this.type = type;
+            this.duration = duration;
+            this.reason = reason;
+            this.animationName = animationName;
+        }
+
+        public AnimationType getType() {
+            return this.type;
+        }
+
+        public String getDuration() {
+            return this.duration;
+        }
+
+        public String getReason() {
+            return this.reason;
+        }
+
+        public String getAnimationName() {
+            return this.animationName;
+        }
     }
 }

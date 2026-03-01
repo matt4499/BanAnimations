@@ -28,11 +28,16 @@ public class BATabCompletion implements TabCompleter {
             suggestions.add("mute");
             suggestions.add("tempmute");
             suggestions.add("kick");
+            suggestions.add("punish");
+            suggestions.add("p");
             suggestions.add("help");
             suggestions.add("list");
             return suggestions;
         }
         if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("punish") || args[0].equalsIgnoreCase("p")) {
+                return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+            }
             return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
         }
         if (args.length == 3) {

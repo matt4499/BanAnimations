@@ -26,7 +26,29 @@ public class BanAnimationsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("bananimations.use")) {
+        boolean isTestCommand = args.length > 0 && args[0].equalsIgnoreCase("test");
+
+        if (args.length >= 1 && (args[0].equalsIgnoreCase("punish") || args[0].equalsIgnoreCase("p"))) {
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage(Utils.color("&cOnly players can use the punish GUI."));
+                return true;
+            }
+
+            if (!sender.hasPermission(this.plugin.getPermissionNode("punish"))) {
+                Messages.NO_PERMS.send(sender);
+                return true;
+            }
+
+            if (args.length < 2) {
+                sender.sendMessage(Utils.color("&cUsage: /ba punish [name]"));
+                return true;
+            }
+
+            this.plugin.getPunishGuiListener().openPunishMenu(player, args[1]);
+            return true;
+        }
+
+        if (!isTestCommand && !sender.hasPermission(this.plugin.getPermissionNode("use"))) {
             Messages.NO_PERMS.send(sender);
             return true;
         }
@@ -37,7 +59,7 @@ public class BanAnimationsCommand implements CommandExecutor {
         }
 
         if (args[0].equalsIgnoreCase("list")) {
-            if (!sender.hasPermission("bananimations.list")) {
+            if (!sender.hasPermission(this.plugin.getPermissionNode("list"))) {
                 Messages.NO_PERMS.send(sender);
                 return true;
             }
@@ -60,31 +82,24 @@ public class BanAnimationsCommand implements CommandExecutor {
 
         switch (args[0].toLowerCase()) {
             case "ban":
-                requiredPermission = "bananimations.ban";
                 type = AnimationType.BAN;
                 break;
             case "kick":
-                requiredPermission = "bananimations.kick";
                 type = AnimationType.KICK;
                 break;
             case "mute":
-                requiredPermission = "bananimations.mute";
                 type = AnimationType.MUTE;
                 break;
             case "ipban":
-                requiredPermission = "bananimations.ipban";
                 type = AnimationType.IP_BAN;
                 break;
             case "tempban":
-                requiredPermission = "bananimations.tempban";
                 type = AnimationType.TEMP_BAN;
                 break;
             case "tempmute":
-                requiredPermission = "bananimations.tempmute";
                 type = AnimationType.TEMP_MUTE;
                 break;
             case "test":
-                requiredPermission = "bananimations.test";
                 type = AnimationType.TEST;
                 break;
             default:
@@ -92,7 +107,9 @@ public class BanAnimationsCommand implements CommandExecutor {
                 return true;
         }
 
-        if (!sender.hasPermission(requiredPermission)) {
+        requiredPermission = this.plugin.getPermissionForType(type);
+
+        if (type != AnimationType.TEST && !sender.hasPermission(requiredPermission)) {
             sendPermissionError(sender, type);
             return true;
         }
@@ -103,7 +120,7 @@ public class BanAnimationsCommand implements CommandExecutor {
             return true;
         }
 
-        if (!type.equals(AnimationType.TEST) && target.hasPermission("bananimation.bypass")) {
+        if (!type.equals(AnimationType.TEST) && target.hasPermission(this.plugin.getPermissionNode("bypass"))) {
             Messages.ERROR_CANT_PLAY_ANIMATION_ON_PLAYER.send(sender, target.getName());
             return true;
         }
@@ -120,10 +137,20 @@ public class BanAnimationsCommand implements CommandExecutor {
             return true;
         }
 
+        String duration = "permanent";
         String reason = "";
-        if (args.length > 3) {
-             reason = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
+        if (type == AnimationType.TEMP_BAN || type == AnimationType.TEMP_MUTE) {
+            if (args.length > 3) {
+                duration = args[3];
+            }
+            if (args.length > 4) {
+                reason = String.join(" ", Arrays.copyOfRange(args, 4, args.length));
+            }
+        } else if (args.length > 3) {
+            reason = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
         }
+
+        this.plugin.setPendingPunishment(target, type, duration, reason, animationName);
 
         Messages.ANIMATION_START_MESSAGE.send(sender, animationName, target.getName());
         this.activateAnimation(sender, target, animationName, type, reason);
@@ -161,6 +188,7 @@ public class BanAnimationsCommand implements CommandExecutor {
                 "  &c/ba &fmute &f[&cplayer&f] [&canimation&f] [&creason...&f]\n" +
                 "  &c/ba &ftempmute &f[&cplayer&f] [&canimation&f] [&cduration&f] [&creason...&f]\n" +
                 "  &c/ba &ftest &f[&cplayer&f] [&canimation&f]\n" +
+                "  &c/ba &fpunish &f[&cplayer&f]\n" +
                 "  &c/ba &flist\n" +
                 "  &c/ba &fhelp\n" +
                 "&c&l&m---&f&l&m-----&r[&c&lBan&f&lAnimations &c&lHelp&r]&f&l&m-----&c&l&m---"
