@@ -117,7 +117,7 @@ public abstract class Animation {
                         if (sender instanceof Player playerSender) {
                             Bukkit.dispatchCommand(playerSender, commandText);
                         } else {
-                            this.plugin.getLogger().warning("Skipping punishment command for '" + target.getName() + "' because initiator is not a player. Command: " + commandText);
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandText);
                         }
                     }
                 }
